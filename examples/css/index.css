@@ -1,0 +1,108 @@
+/*dept*/
+.org {
+  position: relative;
+  cursor: pointer;
+}
+
+.org .sub-orgs, .org .sub-users {
+  display: none;
+}
+
+.org.active > .sub-orgs, .org.active > .sub-users {
+  display: block;
+}
+
+.org .arrow {
+  position: absolute;
+  border: 5px solid #000;
+  border-color: transparent transparent transparent #000;
+  top: 13px;
+}
+
+.org.active > .arrow {
+  border-color: #000 transparent transparent;
+}
+
+.org .org-name {
+  border-bottom: 1px solid #DBDBDB;
+}
+
+.depth-1 .org-name {
+  padding: 10px 0 10px 20px;
+}
+
+.depth-1 .arrow {
+  left: 5px;
+}
+
+.depth-2 .org-name {
+  padding: 10px 0 10px 30px;
+}
+
+.depth-2 .arrow {
+  left: 15px;
+}
+
+.depth-3 .org-name {
+  padding: 10px 0 10px 40px;
+}
+
+.depth-3 .arrow {
+  left: 25px;
+}
+
+.depth-4 .org-name {
+  padding: 10px 0 10px 50px;
+}
+
+.depth-4 .arrow {
+  left: 35px;
+}
+
+.depth-5 .org-name {
+  padding: 10px 0 10px 60px;
+}
+
+.depth-5 .arrow {
+  left: 45px;
+}
+
+.depth-6 .org-name {
+  padding: 10px 0 10px 70px;
+}
+
+.depth-6 .arrow {
+  left: 55px;
+}
+
+.depth-7 .org-name {
+  padding: 10px 0 10px 80px;
+}
+
+.depth-7 .arrow {
+  left: 65px;
+}
+
+.depth-8 .org-name {
+  padding: 10px 0 10px 90px;
+}
+
+.depth-8 .arrow {
+  left: 75px;
+}
+
+.depth-9 .org-name {
+  padding: 10px 0 10px 100px;
+}
+
+.depth-9 .arrow {
+  left: 85px;
+}
+
+.depth-10 .org-name {
+  padding: 10px 0 10px 110px;
+}
+
+.depth-10 .arrow {
+  left: 95px;
+}
