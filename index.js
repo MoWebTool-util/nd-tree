@@ -11,38 +11,6 @@ var $ = require('jquery');
 var ndEvents = require('nd-events');
 var nodeTpl = require('./src/tpl/wrap.handlebars');
 var textNodeTpl = require('./src/tpl/textnode.handlebars');
-
-/*new Tree({
- settings:{},
- events:{}
- data:{},
- keys:{
- idKey:'id',
- pIdKey:'parent_id',
- nameKey:'name',
- subKey:'sub'
- }
- })*/
-
-//支持两种数据格式：
-
-/**第一种
- * [{'id':'','pId':'','name':''}]
- */
-
-/**第二种
- *[{'id':'','pId':'','name':'',sub:[]}]
- * */
-
-
-/** 支持的内置的基本的事件
- *(1)构建树事件
- *(2)点击事件
- *(3)展开事件
- *(4)折叠事件
- *(5)勾选事件
- */
-
 //const
 var _const = {
   events: {
@@ -72,7 +40,6 @@ var _const = {
 
 
 };
-
 //settings
 var _settings = {
   containerId: '',//容器
@@ -190,7 +157,6 @@ var _settings = {
   }
 
 };
-
 //tools
 var tools = {
   camlCase: function (name, id) {
@@ -520,7 +486,6 @@ var triggerEvent = {
       o.trigger(tools.eventName(_const.id.AFTER, _const.events.CHECK), event, node, selectedNodeList);
     }
 };
-
 function expandCollapse(param) {
   if (param.isOpen !== 'true') {
     //点击的文本是关闭状态
@@ -531,7 +496,6 @@ function expandCollapse(param) {
   }
 
 }
-
 function handlerEvent(event) {
   var target = event.target, $target = $(target), settings = event.data.settings, o = settings.self;
 //, dblClickExpand = settings.dblClickExpand;
@@ -600,7 +564,6 @@ function handlerEvent(event) {
       break;
   }
 }
-
 //helper
 var initEventHandler = {
   bindEvent: function (settings) {
@@ -626,8 +589,6 @@ var initEventHandler = {
   }
 
 };
-
-
 //nodesHandler
 var nodesHandler = {
   generatorTree: function (settings, level, nodes) {
@@ -695,16 +656,12 @@ var nodesHandler = {
     return html;
   }
 };
-
-
 //Tree
 var Tree;
-
 Tree = function (settings, data) {
   ndEvents.mixTo(Tree);
   return this.init(settings, data);
 };
-
 Tree.prototype.init = function (settings, data) {
   settings = $.extend(true, _settings, settings);
   settings.container = _settings.container = $(settings.containerId);
@@ -720,8 +677,4 @@ Tree.prototype.init = function (settings, data) {
   //生成树
   nodesHandler.generatorTree(settings, 1, data);
 };
-
 module.exports = Tree;
-
-
-
