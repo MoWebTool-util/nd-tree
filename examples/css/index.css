@@ -1,108 +1,127 @@
 /*dept*/
-.org {
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+.level {
   position: relative;
   cursor: pointer;
 }
 
-.org .sub-orgs, .org .sub-users {
-  display: none;
+.level .icon {
+  background: url('../images/tree.png') no-repeat;
+  margin-right: 2px;
 }
 
-.org.active > .sub-orgs, .org.active > .sub-users {
-  display: block;
+.level .sub-levels {
+  margin: 0;
+  padding: 0 0 0 18px;
 }
 
-.org .arrow {
-  position: absolute;
+.level-node {
+  position: relative;
+  padding-left:5px ;
+}
+.level-node div{
+  display: inline-table;
+  vertical-align: middle;
+}
+.level-node .icon-margin{
+  margin-left: -7px;
+}
+
+.level-node .hollow {
   border: 5px solid #000;
-  border-color: transparent transparent transparent #000;
-  top: 13px;
+  border-color: transparent;
+  position: absolute;
 }
 
-.org.active > .arrow {
+.level-node .arrow {
+  border: 5px solid #000;
+  border-color: transparent;
+}
+
+.level-node .check {
+  width: 13px;
+  height: 13px;
+}
+
+.level-node .switch {
+  width: 18px;
+  height: 18px;
+}
+
+.level-node .node-icon {
+  width: 18px;
+  height: 17px;
+}
+
+.hollowCollapse .icon-arrow-in {
+  border-color: transparent transparent transparent #000;
+  top: 6px;
+  left: 0;
+}
+
+.hollowCollapse .icon-arrow-out {
+  border-color: transparent transparent transparent #fff;
+  top: 6px;
+  left: -1px;
+}
+.hollowExpand .icon-arrow-in {
+  border-color: #000 transparent transparent transparent;
+  top: 8px;
+  left: -5px;
+}
+
+.hollowExpand .icon-arrow-out {
+  border-color:#fff transparent transparent  transparent;
+  top:7px;
+  left: -5px;
+}
+.level-node .icon-arrow-open {
   border-color: #000 transparent transparent;
 }
 
-.org .org-name {
-  border-bottom: 1px solid #DBDBDB;
+.level-node .icon-arrow-close {
+  border-color: transparent transparent transparent #000;
 }
 
-.depth-1 .org-name {
-  padding: 10px 0 10px 20px;
+.level-node .icon-switch-open {
+  background-position: -92px -72px;
 }
 
-.depth-1 .arrow {
-  left: 5px;
+.level-node .icon-switch-close {
+  background-position: -74px -72px;
 }
 
-.depth-2 .org-name {
-  padding: 10px 0 10px 30px;
+.level-node .icon-node-open {
+  background-position: -110px -16px;
 }
 
-.depth-2 .arrow {
-  left: 15px;
+.level-node .icon-node-close {
+  background-position: -110px 0;
 }
 
-.depth-3 .org-name {
-  padding: 10px 0 10px 40px;
+.level-node .icon-unradiocheck {
+  background-position: -28px 0;
 }
 
-.depth-3 .arrow {
-  left: 25px;
+.level-node .icon-radiocheck {
+  background-position: -42px 0;
 }
 
-.depth-4 .org-name {
-  padding: 10px 0 10px 50px;
+.level-node .icon-uncheckbox {
+  background-position: 0 0;
 }
 
-.depth-4 .arrow {
-  left: 35px;
+.level-node .icon-checkbox {
+  background-position: -14px 0;
 }
 
-.depth-5 .org-name {
-  padding: 10px 0 10px 60px;
-}
 
-.depth-5 .arrow {
-  left: 45px;
-}
 
-.depth-6 .org-name {
-  padding: 10px 0 10px 70px;
-}
 
-.depth-6 .arrow {
-  left: 55px;
-}
-
-.depth-7 .org-name {
-  padding: 10px 0 10px 80px;
-}
-
-.depth-7 .arrow {
-  left: 65px;
-}
-
-.depth-8 .org-name {
-  padding: 10px 0 10px 90px;
-}
-
-.depth-8 .arrow {
-  left: 75px;
-}
-
-.depth-9 .org-name {
-  padding: 10px 0 10px 100px;
-}
-
-.depth-9 .arrow {
-  left: 85px;
-}
-
-.depth-10 .org-name {
-  padding: 10px 0 10px 110px;
-}
-
-.depth-10 .arrow {
-  left: 95px;
-}

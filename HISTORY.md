@@ -1,6 +1,9 @@
 # History
 
 ---
+## 0.0.2
+
+- rebuild a common nd-tree
 
 ## 0.0.1
 

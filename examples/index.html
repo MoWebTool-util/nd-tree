@@ -2,294 +2,361 @@
 <html lang="zh-cn">
 
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8"/>
   <title>Demo</title>
   <link rel="stylesheet" href="css/index.css"/>
 </head>
 
 <body>
-  <div id="container">
-    <!-- CONTENT HERE -->
-  </div>
+<div id="container">
+  <!-- CONTENT HERE -->
+</div>
 
-  <script src="seajs/sea.js"></script>
-  <script src="config.js"></script>
-  <script>
-  seajs.use(['index'], function(Tree) {
-   var data={
-     "code": 0,
-     "message": "ok",
-     "list": [
-          {
-             "id": "2",
-             "parent_id": "1",
-             "name": "\u5e74\u7ea7\u7ec4",
-             "read": 0,
-             "unread": 9,
-             "if": 1,
-             "sub": [
-               {
-                 "id": "3",
-                 "parent_id": "2",
-                 "name": "\u4e00\u5e74\u7ea7",
-                 "read": 0,
-                 "unread": 6,
-                 "if": 1,
-                 "sub": [
-                   {
-                     "id": "3",
-                     "parent_id": "2",
-                     "name": "\u4e00\u5e74\u7ea7",
-                     "read": 0,
-                     "unread": 6,
-                     "if": 1,
-                     "sub": []
-                   }
-                 ]
-               },
-               {
-                 "id": "4",
-                 "parent_id": "2",
-                 "name": "\u4e8c\u5e74\u7ea7",
-                 "read": 0,
-                 "unread": 0,
-                 "if": 0,
-                 "sub": []
-               },
-               {
-                 "id": "5",
-                 "parent_id": "2",
-                 "name": "\u4e09\u5e74\u7ea7",
-                 "read": 0,
-                 "unread": 0,
-                 "if": 0,
-                 "sub": []
-               },
-               {
-                 "id": "6",
-                 "parent_id": "2",
-                 "name": "\u56db\u5e74\u7ea7",
-                 "read": 0,
-                 "unread": 0,
-                 "if": 0,
-                 "sub": []
-               },
-               {
-                 "id": "7",
-                 "parent_id": "2",
-                 "name": "\u4e94\u5e74\u7ea7",
-                 "read": 0,
-                 "unread": 1,
-                 "if": 1,
-                 "sub": []
-               },
-               {
-                 "id": "8",
-                 "parent_id": "2",
-                 "name": "\u516d\u5e74\u7ea7",
-                 "read": 0,
-                 "unread": 0,
-                 "if": 0,
-                 "sub": []
-               },
-               {
-                 "id": "26",
-                 "parent_id": "2",
-                 "name": "\u4e03\u5e74\u7ea7",
-                 "read": 0,
-                 "unread": 0,
-                 "if": 0,
-                 "sub": []
-               },
-               {
-                 "id": "27",
-                 "parent_id": "2",
-                 "name": "\u516b\u5e74\u7ea7",
-                 "read": 0,
-                 "unread": 0,
-                 "if": 0,
-                 "sub": []
-               },
-               {
-                 "id": "28",
-                 "parent_id": "2",
-                 "name": "\u4e5d\u5e74\u7ea7",
-                 "read": 0,
-                 "unread": 0,
-                 "if": 0,
-                 "sub": []
-               }
-             ]
-           },
-          {
-             "id": "9",
-             "parent_id": "1",
-             "name": "\u5b66\u79d1\u7ec4",
-             "read": 11,
-             "unread": 75,
-             "if": 0,
-             "sub": [
-               {
-                 "id": "10",
-                 "parent_id": "9",
-                 "name": "\u8bed\u6587\u6559\u7814\u7ec4",
-                 "read": 1,
-                 "unread": 0,
-                 "if": 1,
-                 "sub": []
-               },
-               {
-                 "id": "11",
-                 "parent_id": "9",
-                 "name": "\u6570\u5b66\u6559\u7814\u7ec4",
-                 "read": 0,
-                 "unread": 0,
-                 "if": 0,
-                 "sub": []
-               },
-               {
-                 "id": "12",
-                 "parent_id": "9",
-                 "name": "\u82f1\u8bed\u6559\u7814\u7ec4",
-                 "read": 0,
-                 "unread": 0,
-                 "if": 0,
-                 "sub": []
-               },
-               {
-                 "id": "13",
-                 "parent_id": "9",
-                 "name": "\u7efc\u5408\u6559\u7814\u7ec4",
-                 "read": 0,
-                 "unread": 0,
-                 "if": 0,
-                 "sub": []
-               },
-               {
-                 "id": "29",
-                 "parent_id": "9",
-                 "name": "\u8bed\u6587\u7ec4",
-                 "read": 4,
-                 "unread": 17,
-                 "if": 1,
-                 "sub": []
-               },
-               {
-                 "id": "30",
-                 "parent_id": "9",
-                 "name": "\u6570\u5b66\u7ec4",
-                 "read": 4,
-                 "unread": 21,
-                 "if": 1,
-                 "sub": []
-               },
-               {
-                 "id": "32",
-                 "parent_id": "9",
-                 "name": "\u7269\u7406\u7ec4",
-                 "read": 1,
-                 "unread": 4,
-                 "if": 1,
-                 "sub": []
-               },
-               {
-                 "id": "33",
-                 "parent_id": "9",
-                 "name": "\u5316\u5b66\u7ec4",
-                 "read": 1,
-                 "unread": 12,
-                 "if": 1,
-                 "sub": []
-               },
-               {
-                 "id": "34",
-                 "parent_id": "9",
-                 "name": "\u7efc\u5408\u7ec4",
-                 "read": 0,
-                 "unread": 0,
-                 "if": 0,
-                 "sub": []
-               },
-               {
-                 "id": "342",
-                 "parent_id": "9",
-                 "name": "\u97f3\u4e50\u7ec4",
-                 "read": 0,
-                 "unread": 6,
-                 "if": 1,
-                 "sub": []
-               },
-               {
-                 "id": "343",
-                 "parent_id": "9",
-                 "name": "\u6559\u7814\u5ba4",
-                 "read": 0,
-                 "unread": 6,
-                 "if": 1,
-                 "sub": []
-               },
-               {
-                 "id": "344",
-                 "parent_id": "9",
-                 "name": "\u4f53\u80b2\u7ec4",
-                 "read": 0,
-                 "unread": 5,
-                 "if": 1,
-                 "sub": []
-               },
-               {
-                 "id": "345",
-                 "parent_id": "9",
-                 "name": "\u6821\u9886\u5bfc",
-                 "read": 0,
-                 "unread": 4,
-                 "if": 1,
-                 "sub": []
-               }
-             ]
-           },
-           {
-             "id": "14",
-             "parent_id": "1",
-             "name": "\u5fb7\u80b2\u5904",
-             "read": 0,
-             "unread": 0,
-             "if": 0,
-             "sub": []
-           },
-           {
-             "id": "15",
-             "parent_id": "1",
-             "name": "\u7535\u6559\u4e2d\u5fc3",
-             "read": 0,
-             "unread": 0,
-             "if": 0,
-             "sub": []
-           },
-           {
-             "id": "35",
-             "parent_id": "1",
-             "name": "\u6559\u7814\u7ec4",
-             "read": 0,
-             "unread": 1,
-             "if": 1,
-             "sub": []
-           }
-         ],
-     "class_list": []
-   }
-    var unreadHtml = '', readHtml = '';
-    data.list.forEach(function(item,index,arr){
-     item.parentId=item.parent_id;
-      var o=new Tree(item);
-      readHtml += o.readHtml;
-      unreadHtml += o.unreadHtml;
-    });
+<script src="seajs/sea.js"></script>
+<script src="config.js"></script>
+<script>
+  seajs.use(['index'], function (Tree) {
+    var data = {
+      "code": 0,
+      "message": "ok",
+      "list": [
+        {
+          "id": "2",
+          "parent_id": "1",
+          "name": "\u5e74\u7ea7\u7ec4",
+          "read": 0,
+          "unread": 9,
+          "if": 1,
+          "sub": [
+            {
+              "id": "3",
+              "parent_id": "2",
+              "name": "\u4e00\u5e74\u7ea7",
+              "read": 0,
+              "unread": 6,
+              "if": 1,
+              "sub": [
+                {
+                  "id": "3",
+                  "parent_id": "2",
+                  "name": "\u4e00\u5e74\u7ea7",
+                  "read": 0,
+                  "unread": 6,
+                  "if": 1,
+                  "sub": []
+                }
+              ]
+            },
+            {
+              "id": "4",
+              "parent_id": "2",
+              "name": "\u4e8c\u5e74\u7ea7",
+              "read": 0,
+              "unread": 0,
+              "if": 0,
+              "sub": []
+            },
+            {
+              "id": "5",
+              "parent_id": "2",
+              "name": "\u4e09\u5e74\u7ea7",
+              "read": 0,
+              "unread": 0,
+              "if": 0,
+              "sub": []
+            },
+            {
+              "id": "6",
+              "parent_id": "2",
+              "name": "\u56db\u5e74\u7ea7",
+              "read": 0,
+              "unread": 0,
+              "if": 0,
+              "sub": []
+            },
+            {
+              "id": "7",
+              "parent_id": "2",
+              "name": "\u4e94\u5e74\u7ea7",
+              "read": 0,
+              "unread": 1,
+              "if": 1,
+              "sub": []
+            },
+            {
+              "id": "8",
+              "parent_id": "2",
+              "name": "\u516d\u5e74\u7ea7",
+              "read": 0,
+              "unread": 0,
+              "if": 0,
+              "sub": []
+            },
+            {
+              "id": "26",
+              "parent_id": "2",
+              "name": "\u4e03\u5e74\u7ea7",
+              "read": 0,
+              "unread": 0,
+              "if": 0,
+              "sub": []
+            },
+            {
+              "id": "27",
+              "parent_id": "2",
+              "name": "\u516b\u5e74\u7ea7",
+              "read": 0,
+              "unread": 0,
+              "if": 0,
+              "sub": []
+            },
+            {
+              "id": "28",
+              "parent_id": "2",
+              "name": "\u4e5d\u5e74\u7ea7",
+              "read": 0,
+              "unread": 0,
+              "if": 0,
+              "sub": []
+            }
+          ]
+        },
+        {
+          "id": "9",
+          "parent_id": "1",
+          "name": "\u5b66\u79d1\u7ec4",
+          "read": 11,
+          "unread": 75,
+          "if": 0,
+          "sub": [
+            {
+              "id": "10",
+              "parent_id": "9",
+              "name": "\u8bed\u6587\u6559\u7814\u7ec4",
+              "read": 1,
+              "unread": 0,
+              "if": 1,
+              "sub": []
+            },
+            {
+              "id": "11",
+              "parent_id": "9",
+              "name": "\u6570\u5b66\u6559\u7814\u7ec4",
+              "read": 0,
+              "unread": 0,
+              "if": 0,
+              "sub": []
+            },
+            {
+              "id": "12",
+              "parent_id": "9",
+              "name": "\u82f1\u8bed\u6559\u7814\u7ec4",
+              "read": 0,
+              "unread": 0,
+              "if": 0,
+              "sub": []
+            },
+            {
+              "id": "13",
+              "parent_id": "9",
+              "name": "\u7efc\u5408\u6559\u7814\u7ec4",
+              "read": 0,
+              "unread": 0,
+              "if": 0,
+              "sub": []
+            },
+            {
+              "id": "29",
+              "parent_id": "9",
+              "name": "\u8bed\u6587\u7ec4",
+              "read": 4,
+              "unread": 17,
+              "if": 1,
+              "sub": []
+            },
+            {
+              "id": "30",
+              "parent_id": "9",
+              "name": "\u6570\u5b66\u7ec4",
+              "read": 4,
+              "unread": 21,
+              "if": 1,
+              "sub": []
+            },
+            {
+              "id": "32",
+              "parent_id": "9",
+              "name": "\u7269\u7406\u7ec4",
+              "read": 1,
+              "unread": 4,
+              "if": 1,
+              "sub": []
+            },
+            {
+              "id": "33",
+              "parent_id": "9",
+              "name": "\u5316\u5b66\u7ec4",
+              "read": 1,
+              "unread": 12,
+              "if": 1,
+              "sub": []
+            },
+            {
+              "id": "34",
+              "parent_id": "9",
+              "name": "\u7efc\u5408\u7ec4",
+              "read": 0,
+              "unread": 0,
+              "if": 0,
+              "sub": []
+            },
+            {
+              "id": "342",
+              "parent_id": "9",
+              "name": "\u97f3\u4e50\u7ec4",
+              "read": 0,
+              "unread": 6,
+              "if": 1,
+              "sub": []
+            },
+            {
+              "id": "343",
+              "parent_id": "9",
+              "name": "\u6559\u7814\u5ba4",
+              "read": 0,
+              "unread": 6,
+              "if": 1,
+              "sub": []
+            },
+            {
+              "id": "344",
+              "parent_id": "9",
+              "name": "\u4f53\u80b2\u7ec4",
+              "read": 0,
+              "unread": 5,
+              "if": 1,
+              "sub": []
+            },
+            {
+              "id": "345",
+              "parent_id": "9",
+              "name": "\u6821\u9886\u5bfc",
+              "read": 0,
+              "unread": 4,
+              "if": 1,
+              "sub": []
+            }
+          ]
+        },
+        {
+          "id": "14",
+          "parent_id": "1",
+          "name": "\u5fb7\u80b2\u5904",
+          "read": 0,
+          "unread": 0,
+          "if": 0,
+          "sub": []
+        },
+        {
+          "id": "15",
+          "parent_id": "1",
+          "name": "\u7535\u6559\u4e2d\u5fc3",
+          "read": 0,
+          "unread": 0,
+          "if": 0,
+          "sub": []
+        },
+        {
+          "id": "35",
+          "parent_id": "1",
+          "name": "\u6559\u7814\u7ec4",
+          "read": 0,
+          "unread": 1,
+          "if": 1,
+          "sub": []
+        }
+      ],
+      "class_list": []
+    };
+    var zNodes = [
+      {id: 1, parentId: 0, ename: "父节点1 - 展开", open: true},
+      {id: 11, parentId: 1, ename: "父节点11 - 折叠"},
+      {id: 111, parentId: 11, ename: "叶子节点111"},
+      {id: 112, parentId: 11, ename: "叶子节点112"},
+      {id: 113, parentId: 11, ename: "叶子节点113"},
+      {id: 114, parentId: 11, ename: "叶子节点114"},
+      {id: 12, parentId: 1, ename: "父节点12 - 折叠"},
+      {id: 121, parentId: 12, ename: "叶子节点121"},
+      {id: 122, parentId: 12, ename: "叶子节点122"},
+      {id: 123, parentId: 12, ename: "叶子节点123"},
+      {id: 124, parentId: 12, ename: "叶子节点124"},
+      {id: 13, parentId: 1, ename: "父节点13 - 没有子节点", isParent: true},
+      {id: 2, parentId: 0, ename: "父节点2 - 折叠"},
+      {id: 21, parentId: 2, ename: "父节点21 - 展开", open: true},
+      {id: 211, parentId: 21, ename: "叶子节点211"},
+      {id: 212, parentId: 21, ename: "叶子节点212"},
+      {id: 213, parentId: 21, ename: "叶子节点213"},
+      {id: 214, parentId: 21, ename: "叶子节点214"},
+      {id: 22, parentId: 2, ename: "父节点22 - 折叠"},
+      {id: 221, parentId: 22, ename: "叶子节点221"},
+      {id: 222, parentId: 22, ename: "叶子节点222"},
+      {id: 223, parentId: 22, ename: "叶子节点223"},
+      {id: 224, parentId: 22, ename: "叶子节点224"},
+      {id: 23, parentId: 2, ename: "父节点23 - 折叠"},
+      {id: 231, parentId: 23, ename: "叶子节点231"},
+      {id: 232, parentId: 23, ename: "叶子节点232"},
+      {id: 233, parentId: 23, ename: "叶子节点233"},
+      {id: 234, parentId: 23, ename: "叶子节点234"},
+      {id: 3, parentId: 0, ename: "父节点3 - 没有子节点", isParent: true}
+    ];
 
-   document.getElementById('container').innerHTML=readHtml;
+    new Tree({
+      containerId: '#container',
+      defaultDataFormat: false,
+      expandIndex: 'all',
+      defaultSwitchTheme:'hollow',
+      showParentIcon:true,
+      closeSiblings:true,
+      keys: {
+        pIdKey: 'parent_id',
+        childKey: 'sub'
+      },
+      check:{
+        enable:true,
+        chkStyle: 'radio',//默认是单选
+        radioSettings: {
+          level: 'level'//默认的分组级别在all级
+        },
+        checkboxSettings: {
+          selected:{
+            changeChild:true
+          },
+          unSelected:{
+            changeChild:true
+          }
+        }
+      },
+      classes:{
+        levelClsName:''
+      },
+      templates: {
+        nodeTpl: ''
+      },
+      callbacks: {
+        beforeCreate: function (settings,level,nodes) {
+          console.log('开始准备建树');
+        },
+        onCreate: function (event) {
+          console.log('正在创建树');
+        },
+        afterCreate: function (event) {
+          console.log('树建立成功');
+        }
+      }
+    }, data.list);
 
   });
-  </script>
+</script>
 </body>
 
 </html>
