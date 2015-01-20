@@ -40,7 +40,7 @@ var settings = {
   closeSiblings: true,//展开一个节点的时候，是否关闭兄弟节点，默认true关闭兄弟节点
   dblClickExpand: true,//双击展开父节点，默认是响应双击。
   expandSpeed: 'fast',//展开收缩的动画效果
-  defaultSwitchTheme: 'switch',//两种样式，箭头或者常见的+-;取值'arrow','switch','custom','hollow'默认switch
+  defaultSwitchTheme: 'switch',//三种样式，箭头，空心箭头或者常见的+-;取值'arrow','switch','custom','hollow'默认switch
   showParentIcon: false,//是否显示父节点前面的图标,默认不显示
 //events
   events: {},
@@ -92,17 +92,17 @@ var settings = {
   },
   //单选多选
   check: {
-    enable: true,
-    chkStyle: _const.check.Type[0],//默认是单选
+    enable: true,//要显示单选或多选框，需要设置这个为true
+    chkStyle:'radio',//默认是单选，取值'raido','checkbox'
     radioSettings: {
-      level: _const.check.radioSettings.level[1]//默认的分组级别在all级
+      level: 'all'//默认的分组级别在all级,level级
     },
     checkboxSettings: {
       selected: {
-        changeChild: false
+        changeChild: false//是否同时选中所有的子节点
       },
       unSelected: {
-        changeChild: false
+        changeChild: false//是否同时取消选中所有的子节点
       }
     }
   },
@@ -153,7 +153,7 @@ var settings = {
 
 ##内置三种样式
 ```
- defaultSwitchTheme: 'switch',//两种样式，箭头或者常见的+-;取值'arrow','switch','hollow'
+ defaultSwitchTheme: 'switch',//三种样式，箭头或者常见的+-;取值'arrow','switch','hollow'
  
 自定义，可以选择'custom'
  
