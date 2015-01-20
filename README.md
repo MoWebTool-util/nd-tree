@@ -139,8 +139,8 @@ var settings = {
     },
     //每个节点前面的图标
     nodeIcon: {
-      expand: 'icon icon-node-open',
-      collapse: 'icon icon-node-close'
+      expand: 'icon icon-node-open',//父节点前面的图标
+      collapse: 'icon icon-node-close'//父节点前面的图标
     }
   },
 //节点的模板
