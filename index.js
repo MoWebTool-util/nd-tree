@@ -28,7 +28,7 @@ var _const = {
   },
   defaultEvents: {},
   expandList: ['none', 'all', 'first', 'last'],
-  switchTheme: ['switch', 'arrow', 'custom','hollow'],
+  switchTheme: ['switch', 'arrow', 'custom', 'hollow'],
   switchType: ['Expand', 'Collapse'],
   check: {
     Type: ['radio', 'checkbox'],
@@ -131,8 +131,8 @@ var _settings = {
       switchCollapse: 'icon icon-switch-close',
       arrowExpand: ' icon-arrow-open',
       arrowCollapse: ' icon-arrow-close',
-      hollowExpand:'hollowExpand',
-      hollowCollapse:'hollowCollapse'
+      hollowExpand: 'hollowExpand',
+      hollowCollapse: 'hollowCollapse'
     },
     //单选框和复选框的图标
     check: {
@@ -333,24 +333,36 @@ var htmlHandler = {
     return o;
   }
 };
-var checkNodeHandler={
-  getArrIndex:function(nodeId,selectedNodeList){
-    return $.inArray(nodeId, selectedNodeList);
+var checkNodeHandler = {
+  getObj: function (id, name) {
+    return {id: id, name: name};
   },
-  pushNodeIntoArr:function(index,nodeId,selectedNodeList){
-    if(index===-1){
-      selectedNodeList.push(nodeId);
+  getIndex: function (item, selectedNodeList) {
+    var flag = -1;
+    $.each(selectedNodeList, function (i, v) {
+      if (v.id === item.id) {
+        flag = i;
+        return false;
+      }
+    });
+    return flag;
+  },
+  pushOrDelForArr: function (item, selectedNodeList, type) {
+    var index = checkNodeHandler.getIndex(item, selectedNodeList);
+    if (type === 'splice') {
+      if (index >= 0) {
+        selectedNodeList.splice(index, 1);
+      }
+    } else if (type === 'push') {
+      if (index === -1) {
+        selectedNodeList.push(item);
+      }
     }
   },
-  delNodeFromArr:function(index,selectedNodeList){
-    if(index>=0){
-      selectedNodeList.splice(index,1);
-    }
-  },
-  changeChkNodeCls:function(node,checkTheme,type){
-    if(type==='true'){
+  changeChkNodeCls: function (node, checkTheme, type) {
+    if (type === 'true') {
       node.removeClass(checkTheme.unCheckedTheme).addClass(checkTheme.checkedTheme).attr('data-chkKey', type);
-    }else{
+    } else {
       node.removeClass(checkTheme.checkedTheme).addClass(checkTheme.unCheckedTheme).attr('data-chkKey', type);
     }
   }
@@ -358,7 +370,7 @@ var checkNodeHandler={
 };
 var triggerEvent = {
   commonExpandCollapse: function (event, node, type) {
-    var settings=event.data.settings, expandSpeed = settings.expandSpeed, closeSiblings = settings.closeSiblings;
+    var settings = event.data.settings, expandSpeed = settings.expandSpeed, closeSiblings = settings.closeSiblings;
     var subLevels = node.children('[data-role="sub-levels"]'),
       subOthers = node.children('[data-role="sub-others"]'),
       levelNode = node.children('[data-role="level-node"]'),
@@ -389,7 +401,7 @@ var triggerEvent = {
   expandNode: function (event, node) {
     var settings = event.data.settings, o = settings.self;
     if (!!o.trigger(tools.eventName(_const.id.BEFORE, _const.events.EXPAND), event, node)) {
-      triggerEvent.commonExpandCollapse(event,node,_const.switchType[0]);
+      triggerEvent.commonExpandCollapse(event, node, _const.switchType[0]);
       node.attr('data-open', true);
       o.trigger(tools.eventName(_const.id.ON, _const.events.EXPAND), event, node);
       o.trigger(tools.eventName(_const.id.AFTER, _const.events.EXPAND), event, node);
@@ -407,84 +419,83 @@ var triggerEvent = {
     }
     var settings = event.data.settings, o = settings.self;
     if (!!o.trigger(tools.eventName(_const.id.BEFORE, _const.events.COLLAPSE), event, node)) {
-      triggerEvent.commonExpandCollapse(event,node,_const.switchType[1]);
+      triggerEvent.commonExpandCollapse(event, node, _const.switchType[1]);
       node.attr('data-open', false);
       o.trigger(tools.eventName(_const.id.ON, _const.events.COLLAPSE), event, node);
       o.trigger(tools.eventName(_const.id.AFTER, _const.events.COLLAPSE), event, node);
     }
   },
   checkNode: function (event, node) {
-    var settings = event.data.settings, o = settings.self, radioLevel = settings.check.radioSettings.level, chkStyle = settings.check.chkStyle,
-      selectedNodeList = [], checkSettings = settings.check.checkboxSettings;
-    if (!o.trigger(tools.eventName(_const.id.BEFORE, _const.events.CHECK), event, node)) {return;}
-      var levelNode = node.children('[data-role="level-node"]'),
-        checkNode = levelNode.children('[data-role="check-node"]'),
-        checkTheme = htmlHandler.checkCls(settings),
-        chkKey = checkNode.attr('data-chkKey'),
-        nodeId = node.attr('data-id'),
-        index =checkNodeHandler.getArrIndex(nodeId,selectedNodeList);
-      if (chkKey !== 'true') {
-        //原先没有被选中
-        if (chkStyle === _const.check.Type[0]) {
-          //单选
-          checkNodeHandler.pushNodeIntoArr(index,nodeId,selectedNodeList);
-          if (radioLevel === _const.check.radioSettings.level[0]) {
-            //level
-            node.siblings().each(function (i, item) {
-              var child=$(item).children('[data-role="level-node"]').children('[data-role="check-node"]');
-              checkNodeHandler.changeChkNodeCls(child,checkTheme,'false');
-            });
-          } else if (radioLevel === _const.check.radioSettings.level[1]) {
-            //all
-            var allNodes=settings.container.find('[data-role="check-node"]');
-            checkNodeHandler.changeChkNodeCls(allNodes,checkTheme,'false');
-          }
-          checkNodeHandler.changeChkNodeCls(checkNode,checkTheme,'true');
-        } else if (chkStyle === _const.check.Type[1]) {
-          //多选
-          //选中所有的子节点
-          if (checkSettings.selected.changeChild) {
-            var nodes = node.find('[data-role="check-node"]');
-            nodes.each(function (i, item) {
-              item = $(item);
-              var parentNode = item.closest('[data-action="toggle-node"]'), toggleId = parentNode.attr('data-id');
-              var thisIndex=checkNodeHandler.getArrIndex(toggleId,selectedNodeList);
-              checkNodeHandler.pushNodeIntoArr(thisIndex,toggleId,selectedNodeList);
-              checkNodeHandler.changeChkNodeCls(item,checkTheme,'true');
-
-            });
-          } else {
-            checkNodeHandler.pushNodeIntoArr(index,nodeId,selectedNodeList);
-            checkNodeHandler.changeChkNodeCls(checkNode,checkTheme,'true');
-          }
+    var settings = event.data.settings, o = settings.self, selectedNodeList = o.selectedNodeList || [], radioLevel = settings.check.radioSettings.level, chkStyle = settings.check.chkStyle,
+      checkSettings = settings.check.checkboxSettings;
+    if (!o.trigger(tools.eventName(_const.id.BEFORE, _const.events.CHECK), event, node)) {
+      return;
+    }
+    var levelNode = node.children('[data-role="level-node"]'),
+      checkNode = levelNode.children('[data-role="check-node"]'),
+      checkTheme = htmlHandler.checkCls(settings),
+      chkKey = checkNode.attr('data-chkKey'),
+      nodeId = node.attr('data-id'),
+      nodeName = node.attr('data-name'),
+      currentNode = checkNodeHandler.getObj(nodeId, nodeName);
+    if (chkKey !== 'true') {
+      //原先没有被选中
+      checkNodeHandler.pushOrDelForArr(currentNode, selectedNodeList, 'push');
+      if (chkStyle === _const.check.Type[0]) {
+        //单选
+        if (radioLevel === _const.check.radioSettings.level[0]) {
+          //level
+          node.siblings().each(function (i, item) {
+            var child = $(item).children('[data-role="level-node"]').children('[data-role="check-node"]'), childId = $(item).attr('data-id'),
+              childName = $(item).attr('data-name');
+            checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(childId, childName), selectedNodeList, 'splice');
+            checkNodeHandler.changeChkNodeCls(child, checkTheme, 'false');
+          });
+        } else if (radioLevel === _const.check.radioSettings.level[1]) {
+          //all
+          var allNodes = settings.container.find('[data-role="check-node"]');
+          selectedNodeList = [currentNode];
+          checkNodeHandler.changeChkNodeCls(allNodes, checkTheme, 'false');
         }
-      } else {
-        //原先有被选中
-        checkNodeHandler.changeChkNodeCls(checkNode,checkTheme,'false');
-        if (chkStyle === _const.check.Type[0]) {
-          checkNodeHandler.delNodeFromArr(index,selectedNodeList);
-        } else if (chkStyle === _const.check.Type[1]) {
-          //多选
-          //取消选中所有的子节点
-          if (checkSettings.selected.changeChild) {
-            var unNodes = node.find('[data-role="check-node"]');
-            unNodes.each(function (i, item) {
-              item = $(item);
-              var parentNode = item.closest('[data-action="toggle-node"]'), toggleId = parentNode.attr('data-id');
-              var nodeIndex =checkNodeHandler.getArrIndex(toggleId,selectedNodeList);
-              checkNodeHandler.delNodeFromArr(nodeIndex,selectedNodeList);
-              checkNodeHandler.changeChkNodeCls(item,checkTheme,'false');
-            });
-          } else {
-            checkNodeHandler.delNodeFromArr(index,selectedNodeList);
-            checkNodeHandler.changeChkNodeCls(checkNode,checkTheme,'false');
-          }
+        checkNodeHandler.changeChkNodeCls(checkNode, checkTheme, 'true');
+      } else if (chkStyle === _const.check.Type[1]) {
+        //多选
+        //选中所有的子节点
+        if (checkSettings.selected.changeChild) {
+          var nodes = node.find('[data-role="check-node"]');
+          nodes.each(function (i, item) {
+            item = $(item);
+            var parentNode = item.closest('[data-role="toggle-node"]'), toggleId = parentNode.attr('data-id'), toggleName = parentNode.attr('data-name');
+            checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(toggleId, toggleName), selectedNodeList,'push');
+            checkNodeHandler.changeChkNodeCls(item, checkTheme, 'true');
+          });
+        } else {
+          checkNodeHandler.changeChkNodeCls(checkNode, checkTheme, 'true');
         }
       }
-      o.selectedNodeList = selectedNodeList;
-      o.trigger(tools.eventName(_const.id.ON, _const.events.CHECK), event, node, selectedNodeList);
-      o.trigger(tools.eventName(_const.id.AFTER, _const.events.CHECK), event, node, selectedNodeList);
+    } else {
+      //原先有被选中
+      if (chkStyle === _const.check.Type[1]) {
+        //多选
+        //取消选中所有的子节点
+        if (checkSettings.selected.changeChild) {
+          var unNodes = node.find('[data-role="check-node"]');
+          unNodes.each(function (i, item) {
+            item = $(item);
+            var parentNode = item.closest('[data-role="toggle-node"]'), toggleId = parentNode.attr('data-id'), toggleName = parentNode.attr('data-name');
+            checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(toggleId, toggleName), selectedNodeList,'splice');
+            checkNodeHandler.changeChkNodeCls(item, checkTheme, 'false');
+          });
+        } else {
+          checkNodeHandler.pushOrDelForArr(currentNode, selectedNodeList,'splice');
+          checkNodeHandler.changeChkNodeCls(checkNode, checkTheme, 'false');
+        }
+      }
     }
+    o.selectedNodeList=selectedNodeList;
+    o.trigger(tools.eventName(_const.id.ON, _const.events.CHECK), event, node, selectedNodeList);
+    o.trigger(tools.eventName(_const.id.AFTER, _const.events.CHECK), event, node, selectedNodeList);
+  }
 };
 function expandCollapse(param) {
   if (param.isOpen !== 'true') {
@@ -501,8 +512,8 @@ function handlerEvent(event) {
 //, dblClickExpand = settings.dblClickExpand;
   var node = $target.closest('[data-role="toggle-node"]');
   var isCheckNode = $target.attr('data-role') === 'check-node';//check节点
-  var isSubLevels=$target.attr('data-role')==='sub-levels';
-  var isSubOthers=$target.attr('data-role')==='sub-others';
+  var isSubLevels = $target.attr('data-role') === 'sub-levels';
+  var isSubOthers = $target.attr('data-role') === 'sub-others';
   var isOpen = node.attr('data-open');
   var isParent = node.attr('data-parent');
   var param = {isCheckNode: isCheckNode, event: event, node: node, isOpen: isOpen};
@@ -512,7 +523,7 @@ function handlerEvent(event) {
         if (param.isCheckNode) {
           triggerEvent.checkNode(param.event, param.node);
         } else {
-          if (isParent !== 'true'||isSubLevels||isSubOthers) {
+          if (isParent !== 'true' || isSubLevels || isSubOthers) {
             return;
           }
           expandCollapse(param);
@@ -524,10 +535,10 @@ function handlerEvent(event) {
     case 'dblclick':
       if (!!tools.apply(settings.callbacks.beforeDblClick, [event])) {
         /*if (!param.isCheckNode) {
-          if (dblClickExpand && isParent === 'true') {
-            //expandCollapse(param);
-          }
-        }*/
+         if (dblClickExpand && isParent === 'true') {
+         //expandCollapse(param);
+         }
+         }*/
         tools.apply(settings.callbacks.onDblClick, [event]);
         tools.apply(settings.callbacks.afterDblClick, [event]);
       }
@@ -648,7 +659,7 @@ var nodesHandler = {
   getHtml: function (settings, level, nodes) {
     var html = '', length = nodes.length;
     $.each(nodes, function (i, node) {
-      node.index=i;
+      node.index = i;
       node.isParent = true;
       htmlHandler.open(settings, length, node);
       html += nodesHandler.getChildNodeHtml(settings, level, node);
