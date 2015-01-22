@@ -524,8 +524,6 @@ function handlerEvent(event) {
           triggerEvent.checkNode(param.event, param.node);
         } else {
           if (isParent !== 'true' || isSubLevels || isSubOthers) {
-            o.trigger(tools.eventName(_const.id.ON, _const.events.CLICK), event, node);
-            o.trigger(tools.eventName(_const.id.AFTER, _const.events.CLICK), event, node);
             return;
           }
           expandCollapse(param);
