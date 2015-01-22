@@ -351,6 +351,15 @@
         },
         afterCreate: function (event) {
           console.log('树建立成功');
+        },
+        beforeClick:function(event){
+          console.log('beforeClick');
+        },
+        onClick:function(event){
+          console.log('onClick');
+        },
+        afterClick:function(event){
+          console.log('afterClick');
         }
       }
     }, data.list);
