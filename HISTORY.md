@@ -1,6 +1,10 @@
 # History
 
 ---
+## 0.0.6
+
+- 对外开放checkNodeHandler这个方法
+
 ##0.0.5
 
 -fix bug

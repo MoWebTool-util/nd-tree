@@ -688,4 +688,5 @@ Tree.prototype.init = function (settings, data) {
   //生成树
   nodesHandler.generatorTree(settings, 1, data);
 };
+Tree.changeNodeList=checkNodeHandler;
 module.exports = Tree;
