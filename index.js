@@ -513,7 +513,7 @@ function handlerEvent(event) {
   var node = $target.closest('[data-role="toggle-node"]');
   var isCheckNode = $target.attr('data-role') === 'check-node';//check节点
   var isSubLevels = $target.attr('data-role') === 'sub-levels';
-  var isSubOthers = $target.attr('data-role') === 'sub-others';
+  var isSubOthers = $target.attr('data-role') === 'sub-others'||$target.closest('[data-role="sub-others"]').length>0;
   var isOpen = node.attr('data-open');
   var isParent = node.attr('data-parent');
   var param = {isCheckNode: isCheckNode, event: event, node: node, isOpen: isOpen};
