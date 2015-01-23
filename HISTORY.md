@@ -1,7 +1,7 @@
 # History
 
 ---
-## 0.0.6
+## 0.0.7
 
 - 对外开放checkNodeHandler这个方法
 

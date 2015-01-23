@@ -340,7 +340,7 @@ var checkNodeHandler = {
   getIndex: function (item, selectedNodeList) {
     var flag = -1;
     $.each(selectedNodeList, function (i, v) {
-      if (v.id === item.id) {
+      if (+v.id === +item.id) {
         flag = i;
         return false;
       }
