@@ -678,6 +678,7 @@ Tree.prototype.init = function (settings, data) {
   settings.container = _settings.container = $(settings.containerId);
   settings.container.empty();
   settings.self = this;
+  this.settings=settings;
   data = data ? ($.isArray(data) ? data : []) : [];
 
   initEventHandler.bindEvent(settings);
