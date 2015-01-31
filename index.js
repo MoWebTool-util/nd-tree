@@ -426,7 +426,7 @@ var triggerEvent = {
     }
   },
   checkNode: function (event, node) {
-    var settings = event.data.settings, o = settings.self, selectedNodeList = o.selectedNodeList || [], radioLevel = settings.check.radioSettings.level, chkStyle = settings.check.chkStyle,
+    var settings = event.data.settings, o = settings.self, selectedNodeList = o.selectedNodeList, radioLevel = settings.check.radioSettings.level, chkStyle = settings.check.chkStyle,
       checkSettings = settings.check.checkboxSettings;
     if (!o.trigger(tools.eventName(_const.id.BEFORE, _const.events.CHECK), event, node)) {
       return;
@@ -679,6 +679,7 @@ Tree.prototype.init = function (settings, data) {
   settings.container.empty();
   settings.self = this;
   this.settings=settings;
+  this.selectedNodeList=[];
   data = data ? ($.isArray(data) ? data : []) : [];
 
   initEventHandler.bindEvent(settings);
