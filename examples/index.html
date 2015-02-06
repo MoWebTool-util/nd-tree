@@ -8,8 +8,10 @@
 </head>
 
 <body>
+<button type="button" id="setbutton">设置数据</button>
 <div id="container">
   <!-- CONTENT HERE -->
+
 </div>
 
 <script src="seajs/sea.js"></script>
@@ -279,38 +281,38 @@
       "class_list": []
     };
     var zNodes = [
-      {id: 1, parentId: 0, ename: "父节点1 - 展开", open: true},
-      {id: 11, parentId: 1, ename: "父节点11 - 折叠"},
-      {id: 111, parentId: 11, ename: "叶子节点111"},
-      {id: 112, parentId: 11, ename: "叶子节点112"},
-      {id: 113, parentId: 11, ename: "叶子节点113"},
-      {id: 114, parentId: 11, ename: "叶子节点114"},
-      {id: 12, parentId: 1, ename: "父节点12 - 折叠"},
-      {id: 121, parentId: 12, ename: "叶子节点121"},
-      {id: 122, parentId: 12, ename: "叶子节点122"},
-      {id: 123, parentId: 12, ename: "叶子节点123"},
-      {id: 124, parentId: 12, ename: "叶子节点124"},
-      {id: 13, parentId: 1, ename: "父节点13 - 没有子节点", isParent: true},
-      {id: 2, parentId: 0, ename: "父节点2 - 折叠"},
-      {id: 21, parentId: 2, ename: "父节点21 - 展开", open: true},
-      {id: 211, parentId: 21, ename: "叶子节点211"},
-      {id: 212, parentId: 21, ename: "叶子节点212"},
-      {id: 213, parentId: 21, ename: "叶子节点213"},
-      {id: 214, parentId: 21, ename: "叶子节点214"},
-      {id: 22, parentId: 2, ename: "父节点22 - 折叠"},
-      {id: 221, parentId: 22, ename: "叶子节点221"},
-      {id: 222, parentId: 22, ename: "叶子节点222"},
-      {id: 223, parentId: 22, ename: "叶子节点223"},
-      {id: 224, parentId: 22, ename: "叶子节点224"},
-      {id: 23, parentId: 2, ename: "父节点23 - 折叠"},
-      {id: 231, parentId: 23, ename: "叶子节点231"},
-      {id: 232, parentId: 23, ename: "叶子节点232"},
-      {id: 233, parentId: 23, ename: "叶子节点233"},
-      {id: 234, parentId: 23, ename: "叶子节点234"},
-      {id: 3, parentId: 0, ename: "父节点3 - 没有子节点", isParent: true}
+      {id: 1, parent_id: 0, name: "父节点1 - 展开", open: true},
+      {id: 11, parent_id: 1, name: "父节点11 - 折叠"},
+      {id: 111, parent_id: 11, name: "叶子节点111"},
+      {id: 112, parent_id: 11, name: "叶子节点112"},
+      {id: 113, parent_id: 11, name: "叶子节点113"},
+      {id: 114, parent_id: 11, name: "叶子节点114"},
+      {id: 12, parent_id: 1, name: "父节点12 - 折叠"},
+      {id: 121, parent_id: 12, name: "叶子节点121"},
+      {id: 122, parent_id: 12, name: "叶子节点122"},
+      {id: 123, parent_id: 12, name: "叶子节点123"},
+      {id: 124, parent_id: 12, name: "叶子节点124"},
+      {id: 13, parent_id: 1, name: "父节点13 - 没有子节点", isParent: true},
+      {id: 2, parent_id: 0, name: "父节点2 - 折叠"},
+      {id: 21, parent_id: 2, name: "父节点21 - 展开", open: true},
+      {id: 211, parent_id: 21, name: "叶子节点211"},
+      {id: 212, parent_id: 21, name: "叶子节点212"},
+      {id: 213, parent_id: 21, name: "叶子节点213"},
+      {id: 214, parent_id: 21, name: "叶子节点214"},
+      {id: 22, parent_id: 2, name: "父节点22 - 折叠"},
+      {id: 221, parent_id: 22, name: "叶子节点221"},
+      {id: 222, parent_id: 22, name: "叶子节点222"},
+      {id: 223, parent_id: 22, name: "叶子节点223"},
+      {id: 224, parent_id: 22, name: "叶子节点224"},
+      {id: 23, parent_id: 2, name: "父节点23 - 折叠"},
+      {id: 231, parent_id: 23, name: "叶子节点231"},
+      {id: 232, parent_id: 23, name: "叶子节点232"},
+      {id: 233, parent_id: 23, name: "叶子节点233"},
+      {id: 234, parent_id: 23, name: "叶子节点234"},
+      {id: 3, parent_id: 0, name: "父节点3 - 没有子节点", isParent: true}
     ];
 
-    new Tree({
+    var tree=new Tree({
       containerId: '#container',
       defaultDataFormat: false,
       expandIndex: 'all',
@@ -363,6 +365,10 @@
         }
       }
     }, data.list);
+
+    document.getElementById('setbutton').onclick=function(){
+      tree.set(zNodes);
+    }
 
   });
 </script>

@@ -609,6 +609,7 @@ var nodesHandler = {
         return;
       }
       var html = this.getHtml(settings, level, nodes);
+      settings.container.empty();
       settings.container.append(html);
       settings.self.trigger(tools.eventName(_const.id.AFTER, _const.events.CREATE), settings);
     }
@@ -684,11 +685,14 @@ Tree.prototype.init = function (settings, data) {
 
   initEventHandler.bindEvent(settings);
   initEventHandler.bindDomEvent(settings);
-  if (!settings.defaultDataFormat) {
-    data = tools.normalizeTree(settings, data);
+  this.set(data);
+};
+Tree.prototype.set=function(data){
+  if (!this.settings.defaultDataFormat) {
+    data = tools.normalizeTree(this.settings, data);
   }
   //生成树
-  nodesHandler.generatorTree(settings, 1, data);
+  nodesHandler.generatorTree(this.settings, 1, data);
 };
 Tree.changeNodeList=checkNodeHandler;
 module.exports = Tree;
