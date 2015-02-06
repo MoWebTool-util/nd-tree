@@ -341,7 +341,7 @@ var checkNodeHandler = {
   getIndex: function (item, selectedNodeList) {
     var flag = -1;
     $.each(selectedNodeList, function (i, v) {
-      if (+v.id === +item.id) {
+      if (''+v.id === ''+item.id) {
         flag = i;
         return false;
       }
@@ -694,8 +694,10 @@ Tree.prototype.set=function(data,defaultDataFormat){
   if (!this.settings.defaultDataFormat) {
     data = tools.normalizeTree(this.settings, data);
   }
+  this.selectedNodeList=[];
   //生成树
   nodesHandler.generatorTree(this.settings, 1, data);
+
 };
 Tree.changeNodeList=checkNodeHandler;
 module.exports = Tree;
