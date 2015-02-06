@@ -107,10 +107,10 @@ var _settings = {
     },
     checkboxSettings: {
       selected: {
-        changeChild: false
+        changeChild: true
       },
       unSelected: {
-        changeChild: false
+        changeChild: true
       }
     }
   },
@@ -184,6 +184,7 @@ var tools = {
     var r = [];
     var tmpArr = [];
     for (i = 0, m = list.length; i < m; i++) {
+      list[i][childKey]=[];
       tmpArr[list[i][idKey]] = list[i];
     }
     for (i = 0, m = list.length; i < m; i++) {
@@ -681,13 +682,15 @@ Tree.prototype.init = function (settings, data) {
   settings.self = this;
   this.settings=settings;
   this.selectedNodeList=[];
-  data = data ? ($.isArray(data) ? data : []) : [];
-
+  this.set(data);
   initEventHandler.bindEvent(settings);
   initEventHandler.bindDomEvent(settings);
-  this.set(data);
 };
-Tree.prototype.set=function(data){
+Tree.prototype.set=function(data,defaultDataFormat){
+  data = data ? ($.isArray(data) ? data : []) : [];
+  if(typeof defaultDataFormat!=='undefined'){
+    this.settings.defaultDataFormat=defaultDataFormat;
+  }
   if (!this.settings.defaultDataFormat) {
     data = tools.normalizeTree(this.settings, data);
   }

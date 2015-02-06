@@ -8,7 +8,8 @@
 </head>
 
 <body>
-<button type="button" id="setbutton">设置数据</button>
+<button type="button" id="setbutton">设置defaultDataFormat为false</button>
+<button type="button" id="resetbutton">设置defaultDataFormat为true</button>
 <div id="container">
   <!-- CONTENT HERE -->
 
@@ -314,7 +315,7 @@
 
     var tree=new Tree({
       containerId: '#container',
-      defaultDataFormat: false,
+      defaultDataFormat: true,
       expandIndex: 'all',
       defaultSwitchTheme:'hollow',
       showParentIcon:true,
@@ -367,7 +368,10 @@
     }, data.list);
 
     document.getElementById('setbutton').onclick=function(){
-      tree.set(zNodes);
+      tree.set(zNodes,false);
+    }
+    document.getElementById('resetbutton').onclick=function(){
+      tree.set(data.list,true);
     }
 
   });
