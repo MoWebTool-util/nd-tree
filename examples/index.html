@@ -316,7 +316,7 @@
     var tree=new Tree({
       containerId: '#container',
       defaultDataFormat: true,
-      expandIndex: 'all',
+      expandIndex: 'first',
       defaultSwitchTheme:'hollow',
       showParentIcon:true,
       closeSiblings:true,
@@ -326,9 +326,9 @@
       },
       check:{
         enable:true,
-        chkStyle: 'checkbox',//默认是单选
+        chkStyle: 'radio',//默认是单选
         radioSettings: {
-          level: 'all'//默认的分组级别在all级
+          level: 'level'//默认的分组级别在all级
         },
         checkboxSettings: {
           selected:{
@@ -354,6 +354,7 @@
         },
         afterCreate: function (event) {
           console.log('树建立成功');
+          console.log(tree.selectedNodeList);
         },
         beforeClick:function(event){
           console.log('beforeClick',event);
