@@ -53,34 +53,36 @@ Tree.prototype.getSelectedList = function () {
   return this.selectedNodeList;
 };
 Tree.prototype.pushNodeToSelectedList = function (ids, parentNode) {
+  var selectedNodeList=this.selectedNodeList,settings=this.settings;
   if($.isArray(ids)){
     //数组的id['1','2','3']
     $.each(ids,function(key,id){
-      checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id), this.selectedNodeList, 'push', this.settings, parentNode);
+      checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id),selectedNodeList, 'push', settings, parentNode);
     });
   }else if(typeof ids==='string'){
     //字符串的id'123'
-    checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(ids),this.selectedNodeList, 'push', this.settings, parentNode);
+    checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(ids),selectedNodeList, 'push', settings, parentNode);
   }else{
     //object对象{id:id}
-    checkNodeHandler.pushOrDelForArr(ids,this.selectedNodeList, 'push', this.settings, parentNode);
+    checkNodeHandler.pushOrDelForArr(ids,selectedNodeList, 'push', settings, parentNode);
   }
-  this.trigger('pushList',this.selectedNodeList);
+  this.trigger('pushList',selectedNodeList);
 };
 Tree.prototype.spliceNodeFromSelectedList = function (ids,parentNode) {
+  var selectedNodeList=this.selectedNodeList,settings=this.settings;
   if($.isArray(ids)){
     //数组的id['1','2','3']
     $.each(ids,function(key,id){
-      checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id), this.selectedNodeList, 'splice', this.settings, parentNode);
+      checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id), selectedNodeList, 'splice', settings, parentNode);
     });
   }else if(typeof ids==='string'){
     //字符串的id'123'
-    checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(ids),this.selectedNodeList, 'splice', this.settings, parentNode);
+    checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(ids),selectedNodeList, 'splice', settings, parentNode);
   }else{
     //object对象{id:id}
-    checkNodeHandler.pushOrDelForArr(ids,this.selectedNodeList, 'splice', this.settings, parentNode);
+    checkNodeHandler.pushOrDelForArr(ids,selectedNodeList, 'splice', settings, parentNode);
   }
-  this.trigger('spliceList',this.selectedNodeList);
+  this.trigger('spliceList',selectedNodeList);
 };
 Tree.changeNodeList = checkNodeHandler;
 module.exports = Tree;
