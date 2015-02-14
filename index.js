@@ -52,12 +52,34 @@ Tree.prototype.getCheckTheme = function () {
 Tree.prototype.getSelectedList = function () {
   return this.selectedNodeList;
 };
-Tree.prototype.pushNodeToSelectedList = function (item, parentNode) {
-  checkNodeHandler.pushOrDelForArr(item, this.selectedNodeList, 'push', this.settings, parentNode);
+Tree.prototype.pushNodeToSelectedList = function (ids, parentNode) {
+  if($.isArray(ids)){
+    //数组的id['1','2','3']
+    $.each(ids,function(key,id){
+      checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id), this.selectedNodeList, 'push', this.settings, parentNode);
+    });
+  }else if(typeof ids==='string'){
+    //字符串的id'123'
+    checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(ids),this.selectedNodeList, 'push', this.settings, parentNode);
+  }else{
+    //object对象{id:id}
+    checkNodeHandler.pushOrDelForArr(ids,this.selectedNodeList, 'push', this.settings, parentNode);
+  }
   this.trigger('pushList',this.selectedNodeList);
 };
-Tree.prototype.spliceNodeFromSelectedList = function (item,parentNode) {
-  checkNodeHandler.pushOrDelForArr(item, this.selectedNodeList, 'splice', this.settings, parentNode);
+Tree.prototype.spliceNodeFromSelectedList = function (ids,parentNode) {
+  if($.isArray(ids)){
+    //数组的id['1','2','3']
+    $.each(ids,function(key,id){
+      checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id), this.selectedNodeList, 'splice', this.settings, parentNode);
+    });
+  }else if(typeof ids==='string'){
+    //字符串的id'123'
+    checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(ids),this.selectedNodeList, 'splice', this.settings, parentNode);
+  }else{
+    //object对象{id:id}
+    checkNodeHandler.pushOrDelForArr(ids,this.selectedNodeList, 'splice', this.settings, parentNode);
+  }
   this.trigger('spliceList',this.selectedNodeList);
 };
 Tree.changeNodeList = checkNodeHandler;
