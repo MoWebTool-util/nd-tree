@@ -1,12 +1,12 @@
 'use strict';
-var $=require('jquery');
-var tools=require('./tools');
-var htmlHandler=require('./nodeHandler');
-var checkNodeHandler=require('./triggerCheck');
-var config=require('./settings');
-var _const=config._const;
+var $ = require('jquery');
+var tools = require('./tools');
+var htmlHandler = require('./nodeHandler');
+var checkNodeHandler = require('./triggerCheck');
+var config = require('./settings');
+var _const = config._const;
 
-var triggerEvent=module.exports={
+var triggerEvent = module.exports = {
   commonExpandCollapse: function (event, node, type) {
     var settings = event.data.settings, expandSpeed = settings.expandSpeed, closeSiblings = settings.closeSiblings;
     var subLevels = node.children('[data-role="sub-levels"]'),
@@ -84,41 +84,78 @@ var triggerEvent=module.exports={
           node.siblings().each(function (i, item) {
             var child = $(item).children('[data-role="level-node"]').children('[data-role="check-node"]'), childId = $(item).attr('data-id'),
               childName = $(item).attr('data-name');
-            checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(childId, childName,child), selectedNodeList, 'splice',settings);
+            checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(childId, childName, child), selectedNodeList, 'splice', settings);
           });
         } else if (radioLevel === _const.check.radioSettings.level[1]) {
           //all
           var allNodes = settings.container.find('[data-role="check-node"]');
-          selectedNodeList=[];
+          selectedNodeList = [];
           checkNodeHandler.changeChkNodeCls(allNodes, checkTheme, 'false');
         }
       } else if (chkStyle === _const.check.Type[1]) {
         //多选
         //选中所有的子节点
         if (checkSettings.selected.changeChild) {
+          //同时处理子节点
           var nodes = node.find('[data-role="check-node"]');
           nodes.each(function (i, item) {
             item = $(item);
             var parentNode = item.closest('[data-role="toggle-node"]'), toggleId = parentNode.attr('data-id'), toggleName = parentNode.attr('data-name');
-            checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(toggleId, toggleName,item), selectedNodeList, 'push',settings);
+            checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(toggleId, toggleName, item), selectedNodeList, 'push', settings);
           });
         }
+        if (checkSettings.selected.changeParent) {
+          //同时处理父节点(选中)
+          var curLevel = +node.data('level') - 1;
+          while (curLevel > 0) {
+            var parentLevel = node.closest('.level-' + curLevel);
+            if (parentLevel.length) {
+              var toggleId = parentLevel.attr('data-id'), toggleName = parentLevel.attr('data-name');
+              checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(toggleId, toggleName), selectedNodeList, 'push', settings);
+            }
+            --curLevel;
+          }
+        }
       }
-      checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(nodeId, nodeName,checkNode), selectedNodeList, 'push',settings);
+      checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(nodeId, nodeName, checkNode), selectedNodeList, 'push', settings);
     } else {
       //原先有被选中
       if (chkStyle === _const.check.Type[1]) {
         //多选
         //取消选中所有的子节点
         if (checkSettings.selected.changeChild) {
+          //同时处理子节点
           var unNodes = node.find('[data-role="check-node"]');
           unNodes.each(function (i, item) {
             item = $(item);
             var parentNode = item.closest('[data-role="toggle-node"]'), toggleId = parentNode.attr('data-id'), toggleName = parentNode.attr('data-name');
-            checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(toggleId, toggleName,item), selectedNodeList, 'splice',settings);
+            checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(toggleId, toggleName, item), selectedNodeList, 'splice', settings);
           });
         } else {
-          checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(nodeId, nodeName,checkNode), selectedNodeList, 'splice',settings);
+          checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(nodeId, nodeName, checkNode), selectedNodeList, 'splice', settings);
+        }
+        if (checkSettings.selected.changeParent) {
+          //同时处理父节点（如果还有子节点被选中,则父节点还是选中状态，否则父节点取消选中）
+          var nowLevel = +node.data('level') - 1;
+          while (nowLevel > 0) {
+            var nowNode = node.closest('.level-' + nowLevel);
+            var childNodes = nowNode.children('[data-role="sub-levels"]').children('[data-role="toggle-node"]').children('[data-role="level-node"]').children('[data-role="check-node"]');
+            var m = 0;
+            $.each(childNodes, function (i, item) {
+              var chkKey = '' + $(item).attr('data-chkKey');
+              if (chkKey === 'true') {
+                m++;
+                return false;
+              }
+            });
+            if (nowNode.length && m === 0) {
+              var curId = nowNode.attr('data-id'), curName = nowNode.attr('data-name');
+              checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(curId, curName), selectedNodeList, 'splice', settings);
+              --nowLevel;
+              continue;
+            }
+            break;
+          }
         }
       }
     }

@@ -97,10 +97,12 @@ var _settings = {
     },
     checkboxSettings: {
       selected: {
-        changeChild: true
+        changeChild: true,
+        changeParent:true
       },
       unSelected: {
-        changeChild: true
+        changeChild: true,
+        changeParent:true
       }
     }
   },
