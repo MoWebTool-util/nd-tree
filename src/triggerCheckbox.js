@@ -12,6 +12,7 @@ module.exports = {
     var changeParent = settings.check.checkboxSettings.changeParent;
     return {enable: enable, chkStyle: chkStyle, changeChild: changeChild, changeParent: changeParent};
   },
+  /*jshint maxdepth:4*/
   selected: function (settings, selectedNodeList, node) {
     var o = this.getSettings(settings);
     if (o.enable && o.chkStyle === _const.check.Type[1]) {
@@ -29,7 +30,7 @@ module.exports = {
         //同时处理父节点(选中)
         var curLevel = +node.data('level') - 1;
         while (curLevel > 0) {
-          /*jshint maxdepth:4*/
+
           var parentLevel = node.closest('.level-' + curLevel);
           if (parentLevel.length) {
             var toggleId = parentLevel.attr('data-id'), toggleName = parentLevel.attr('data-name');
@@ -40,6 +41,7 @@ module.exports = {
       }
     }
   },
+  /*jshint maxdepth:4*/ /*jshint loopfunc:true*/
   unselected: function (settings, selectedNodeList, node) {
     var o = this.getSettings(settings);
     if (o.enable && o.chkStyle === _const.check.Type[1]) {
@@ -67,7 +69,6 @@ module.exports = {
               return false;
             }
           });
-          /*jshint maxdepth:4*/
           if (nowNode.length && m === 0) {
             var curId = nowNode.attr('data-id'), curName = nowNode.attr('data-name');
             checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(curId, curName), selectedNodeList, 'splice', settings);

@@ -33,7 +33,7 @@ var checkNodeHandler = module.exports = {
     }
     return node;
   },
-
+  /*jshint maxparams:5*/
   pushOrDelForArr: function (item, selectedNodeList, type, settings, parentNode) {
     var index = checkNodeHandler.getIndex(item, selectedNodeList);
     var checkTheme = htmlHandler.checkCls(settings);
