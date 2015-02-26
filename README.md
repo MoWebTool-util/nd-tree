@@ -98,11 +98,8 @@ var settings = {
       level: 'all'//默认的分组级别在all级,level级
     },
     checkboxSettings: {
-      selected: {
-        changeChild: false//是否同时选中所有的子节点
-      },
-      unSelected: {
-        changeChild: false//是否同时取消选中所有的子节点
+        changeChild: true//是否同时选中所有的子节点,默认都要处理
+        changeParent: true//是否同时取消选中所有的子节点，默认都要处理
       }
     }
   },
