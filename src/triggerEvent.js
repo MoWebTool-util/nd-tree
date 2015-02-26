@@ -3,6 +3,7 @@ var $ = require('jquery');
 var tools = require('./tools');
 var htmlHandler = require('./nodeHandler');
 var checkNodeHandler = require('./triggerCheck');
+var checkboxHandler = require('./triggerCheckbox');
 var config = require('./settings');
 var _const = config._const;
 
@@ -64,8 +65,8 @@ var triggerEvent = module.exports = {
     }
   },
   checkNode: function (event, node) {
-    var settings = event.data.settings, o = settings.self, selectedNodeList = o.selectedNodeList, radioLevel = settings.check.radioSettings.level, chkStyle = settings.check.chkStyle,
-      checkSettings = settings.check.checkboxSettings;
+    var settings = event.data.settings, o = settings.self, selectedNodeList = o.selectedNodeList, radioLevel = settings.check.radioSettings.level, chkStyle = settings.check.chkStyle;
+    var checkSettings = settings.check.checkboxSettings;
     if (!o.trigger(tools.eventName(_const.id.BEFORE, _const.events.CHECK), event, node)) {
       return;
     }
@@ -95,67 +96,19 @@ var triggerEvent = module.exports = {
       } else if (chkStyle === _const.check.Type[1]) {
         //多选
         //选中所有的子节点
-        if (checkSettings.selected.changeChild) {
-          //同时处理子节点
-          var nodes = node.find('[data-role="check-node"]');
-          nodes.each(function (i, item) {
-            item = $(item);
-            var parentNode = item.closest('[data-role="toggle-node"]'), toggleId = parentNode.attr('data-id'), toggleName = parentNode.attr('data-name');
-            checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(toggleId, toggleName, item), selectedNodeList, 'push', settings);
-          });
-        }
-        if (checkSettings.selected.changeParent) {
-          //同时处理父节点(选中)
-          var curLevel = +node.data('level') - 1;
-          while (curLevel > 0) {
-            var parentLevel = node.closest('.level-' + curLevel);
-            if (parentLevel.length) {
-              var toggleId = parentLevel.attr('data-id'), toggleName = parentLevel.attr('data-name');
-              checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(toggleId, toggleName), selectedNodeList, 'push', settings);
-            }
-            --curLevel;
-          }
-        }
+        checkboxHandler.selected(settings, selectedNodeList, node);
       }
+      //当前节点
       checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(nodeId, nodeName, checkNode), selectedNodeList, 'push', settings);
     } else {
       //原先有被选中
       if (chkStyle === _const.check.Type[1]) {
         //多选
         //取消选中所有的子节点
-        if (checkSettings.selected.changeChild) {
-          //同时处理子节点
-          var unNodes = node.find('[data-role="check-node"]');
-          unNodes.each(function (i, item) {
-            item = $(item);
-            var parentNode = item.closest('[data-role="toggle-node"]'), toggleId = parentNode.attr('data-id'), toggleName = parentNode.attr('data-name');
-            checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(toggleId, toggleName, item), selectedNodeList, 'splice', settings);
-          });
-        } else {
+        checkboxHandler.unselected(settings, selectedNodeList, node);
+        //当前节点
+        if (!checkSettings.changeChild) {
           checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(nodeId, nodeName, checkNode), selectedNodeList, 'splice', settings);
-        }
-        if (checkSettings.selected.changeParent) {
-          //同时处理父节点（如果还有子节点被选中,则父节点还是选中状态，否则父节点取消选中）
-          var nowLevel = +node.data('level') - 1;
-          while (nowLevel > 0) {
-            var nowNode = node.closest('.level-' + nowLevel);
-            var childNodes = nowNode.children('[data-role="sub-levels"]').children('[data-role="toggle-node"]').children('[data-role="level-node"]').children('[data-role="check-node"]');
-            var m = 0;
-            $.each(childNodes, function (i, item) {
-              var chkKey = '' + $(item).attr('data-chkKey');
-              if (chkKey === 'true') {
-                m++;
-                return false;
-              }
-            });
-            if (nowNode.length && m === 0) {
-              var curId = nowNode.attr('data-id'), curName = nowNode.attr('data-name');
-              checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(curId, curName), selectedNodeList, 'splice', settings);
-              --nowLevel;
-              continue;
-            }
-            break;
-          }
         }
       }
     }

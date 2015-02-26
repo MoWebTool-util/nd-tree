@@ -96,14 +96,16 @@ var _settings = {
       level: _const.check.radioSettings.level[1]//默认的分组级别在all级
     },
     checkboxSettings: {
-      selected: {
+      changeChild:true,
+      changeParent:true
+    /*  selected: {
         changeChild: true,
         changeParent:true
       },
       unSelected: {
         changeChild: true,
         changeParent:true
-      }
+      }*/
     }
   },
 //启用编辑

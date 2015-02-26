@@ -313,40 +313,36 @@
       {id: 3, parent_id: 0, name: "父节点3 - 没有子节点", isParent: true}
     ];
 
-    var tree=new Tree({
+    var tree = new Tree({
       containerId: '#container',
       defaultDataFormat: true,
       expandIndex: 'first',
-      defaultSwitchTheme:'hollow',
-      showParentIcon:true,
-      closeSiblings:true,
+      defaultSwitchTheme: 'hollow',
+      showParentIcon: true,
+      closeSiblings: true,
       keys: {
         pIdKey: 'parent_id',
         childKey: 'sub'
       },
-      check:{
-        enable:true,
+      check: {
+        enable: true,
         chkStyle: 'checkbox',//默认是单选
         radioSettings: {
           level: 'level'//默认的分组级别在all级
         },
         checkboxSettings: {
-          selected:{
-            changeChild:true
-          },
-          unSelected:{
-            changeChild:true
-          }
+          changeChild: true,
+          changParent:true
         }
       },
-      classes:{
-        levelClsName:''
+      classes: {
+        levelClsName: ''
       },
       templates: {
         nodeTpl: ''
       },
       callbacks: {
-        beforeCreate: function (settings,level,nodes) {
+        beforeCreate: function (settings, level, nodes) {
           console.log('开始准备建树');
         },
         onCreate: function (event) {
@@ -356,26 +352,26 @@
           console.log('树建立成功');
           console.log(tree.selectedNodeList);
         },
-        beforeClick:function(event){
-          console.log('beforeClick',event);
+        beforeClick: function (event) {
+          console.log('beforeClick', event);
         },
-        onClick:function(event){
+        onClick: function (event) {
           console.log('onClick');
         },
-        afterClick:function(event){
+        afterClick: function (event) {
           console.log('afterClick');
         },
-        afterCheck:function(){
+        afterCheck: function () {
           console.log(tree.selectedNodeList);
         }
       }
     }, data.list);
 
-    document.getElementById('setbutton').onclick=function(){
-      tree.set(zNodes,false);
+    document.getElementById('setbutton').onclick = function () {
+      tree.set(zNodes, false);
     }
-    document.getElementById('resetbutton').onclick=function(){
-      tree.set(data.list,true);
+    document.getElementById('resetbutton').onclick = function () {
+      tree.set(data.list, true);
     }
 
   });

@@ -9,13 +9,14 @@
 var Tree;
 var $ = require('jquery');
 var ndEvents = require('nd-events');
-var config=require('./src/settings');
-var tools=require('./src/tools');
-var htmlHandler=require('./src/nodeHandler');
-var nodesHandler=require('./src/generatorTree');
-var initEventHandler=require('./src/initEvent');
-var checkNodeHandler=require('./src/triggerCheck');
-var _settings=config._settings;
+var config = require('./src/settings');
+var tools = require('./src/tools');
+var htmlHandler = require('./src/nodeHandler');
+var nodesHandler = require('./src/generatorTree');
+var initEventHandler = require('./src/initEvent');
+var checkNodeHandler = require('./src/triggerCheck');
+var checkboxHandler=require('./src/triggerCheckbox');
+var _settings = config._settings;
 
 //Tree
 var Tree;
@@ -53,36 +54,53 @@ Tree.prototype.getSelectedList = function () {
   return this.selectedNodeList;
 };
 Tree.prototype.pushNodeToSelectedList = function (ids, parentNode) {
-  var selectedNodeList=this.selectedNodeList,settings=this.settings;
-  if($.isArray(ids)){
+  var selectedNodeList = this.selectedNodeList, settings = this.settings,node;
+  if ($.isArray(ids)) {
     //数组的id['1','2','3']
-    $.each(ids,function(key,id){
-      checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id),selectedNodeList, 'push', settings, parentNode);
+    $.each(ids, function (key, id) {
+      node=checkNodeHandler.getNodeById(id,settings);
+      checkboxHandler.selected(settings,selectedNodeList,node);
+      checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id), selectedNodeList, 'push', settings, parentNode);
     });
-  }else if(typeof ids==='string'){
+  } else if (typeof ids === 'string') {
     //字符串的id'123'
-    checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(ids),selectedNodeList, 'push', settings, parentNode);
-  }else{
+    node=checkNodeHandler.getNodeById(ids,settings);
+    checkboxHandler.selected(settings,selectedNodeList,node);
+    checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(ids), selectedNodeList, 'push', settings, parentNode);
+  } else {
     //object对象{id:id}
-    checkNodeHandler.pushOrDelForArr(ids,selectedNodeList, 'push', settings, parentNode);
+    node=checkNodeHandler.getNodeById(ids,settings);
+    checkboxHandler.selected(settings,selectedNodeList,node);
+    checkNodeHandler.pushOrDelForArr(ids, selectedNodeList, 'push', settings, parentNode);
   }
-  this.trigger('pushList',selectedNodeList);
+  this.trigger('pushList', selectedNodeList);
 };
-Tree.prototype.spliceNodeFromSelectedList = function (ids,parentNode) {
-  var selectedNodeList=this.selectedNodeList,settings=this.settings;
-  if($.isArray(ids)){
+Tree.prototype.spliceNodeFromSelectedList = function (ids, parentNode) {
+  var selectedNodeList = this.selectedNodeList, settings = this.settings,node;
+  if ($.isArray(ids)) {
     //数组的id['1','2','3']
-    $.each(ids,function(key,id){
+    $.each(ids, function (key, id) {
+      //处理父节点子节点
+       node=checkNodeHandler.getNodeById(id,settings);
+      checkboxHandler.unselected(settings,selectedNodeList,node);
+      //当前节点
       checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id), selectedNodeList, 'splice', settings, parentNode);
     });
-  }else if(typeof ids==='string'){
+  } else if (typeof ids === 'string') {
     //字符串的id'123'
-    checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(ids),selectedNodeList, 'splice', settings, parentNode);
-  }else{
+    //处理父节点子节点
+     node=checkNodeHandler.getNodeById(ids,settings);
+    checkboxHandler.unselected(settings,selectedNodeList,node);
+    //当前节点
+    checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(ids), selectedNodeList, 'splice', settings, parentNode);
+  } else {
     //object对象{id:id}
-    checkNodeHandler.pushOrDelForArr(ids,selectedNodeList, 'splice', settings, parentNode);
+     node=checkNodeHandler.getNodeById(ids,settings);
+    checkboxHandler.unselected(settings,selectedNodeList,node);
+    //当前节点
+    checkNodeHandler.pushOrDelForArr(ids, selectedNodeList, 'splice', settings, parentNode);
   }
-  this.trigger('spliceList',selectedNodeList);
+  this.trigger('spliceList', selectedNodeList);
 };
 Tree.changeNodeList = checkNodeHandler;
 module.exports = Tree;

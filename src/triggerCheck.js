@@ -1,10 +1,10 @@
 'use strict';
-var $=require('jquery');
-var htmlHandler=require('./nodeHandler');
-var checkNodeHandler=module.exports={
-  getObj: function (id, name,child) {
-    var node=child?child:null;
-    return {id: id, name: name,node:node};
+var $ = require('jquery');
+var htmlHandler = require('./nodeHandler');
+var checkNodeHandler = module.exports = {
+  getObj: function (id, name, child) {
+    var node = child ? child : null;
+    return {id: id, name: name, node: node};
   },
   getIndex: function (item, selectedNodeList) {
     var flag = -1;
@@ -16,28 +16,28 @@ var checkNodeHandler=module.exports={
     });
     return flag;
   },
-  getNode: function (id, parentNode) {
-    return parentNode.find('[data-id="' + id + '"]')
-      .children('[data-role="level-node"]')
-      .children('[data-role="check-node"]');
+  getNodeById: function (id, settings,parentNode) {
+    parentNode = parentNode ? parentNode : settings.container;
+    return parentNode.find('[data-id="' + id + '"]');
   },
-  getCurNode:function(item,settings,parentNode){
+  getNode: function (id, parentNode, settings) {
+    var node = this.getNodeById(id, settings,parentNode);
+    return node.children('[data-role="level-node"]').children('[data-role="check-node"]');
+  },
+  getCurNode: function (item, settings, parentNode) {
     var node;
-    if(item.node){
-      node=item.node;
-    }else{
-      if (parentNode) {
-        node = checkNodeHandler.getNode(item.id, parentNode);
-      } else {
-        node = checkNodeHandler.getNode(item.id, settings.container);
-      }
+    if (item.node) {
+      node = item.node;
+    } else {
+      node = checkNodeHandler.getNode(item.id, parentNode, settings);
     }
     return node;
   },
+
   pushOrDelForArr: function (item, selectedNodeList, type, settings, parentNode) {
     var index = checkNodeHandler.getIndex(item, selectedNodeList);
     var checkTheme = htmlHandler.checkCls(settings);
-    var node=checkNodeHandler.getCurNode(item,settings,parentNode);
+    var node = checkNodeHandler.getCurNode(item, settings, parentNode);
     if (type === 'splice') {
       if (index >= 0) {
         selectedNodeList.splice(index, 1);
