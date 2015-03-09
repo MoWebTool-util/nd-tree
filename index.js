@@ -58,9 +58,15 @@ Tree.prototype.pushNodeToSelectedList = function (ids, parentNode) {
   if ($.isArray(ids)) {
     //数组的id['1','2','3']
     $.each(ids, function (key, id) {
-      node=checkNodeHandler.getNodeById(id,settings);
-      checkboxHandler.selected(settings,selectedNodeList,node);
-      checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id), selectedNodeList, 'push', settings, parentNode);
+      if(typeof id==='string'){
+        node=checkNodeHandler.getNodeById(id,settings);
+        checkboxHandler.selected(settings,selectedNodeList,node);
+        checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id), selectedNodeList, 'push', settings, parentNode);
+      }else if(typeof id==='object'){
+        node=checkNodeHandler.getNodeById(id.id,settings);
+        checkboxHandler.selected(settings,selectedNodeList,node);
+        checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id.id,id.name), selectedNodeList, 'push', settings, parentNode);
+      }
     });
   } else if (typeof ids === 'string') {
     //字符串的id'123'
@@ -78,24 +84,32 @@ Tree.prototype.pushNodeToSelectedList = function (ids, parentNode) {
 Tree.prototype.spliceNodeFromSelectedList = function (ids, parentNode) {
   var selectedNodeList = this.selectedNodeList, settings = this.settings,node;
   if ($.isArray(ids)) {
-    //数组的id['1','2','3']
+    //数组的id['1','2','3']或者[{id:'1',name:'测试1'}]
     $.each(ids, function (key, id) {
       //处理父节点子节点
-       node=checkNodeHandler.getNodeById(id,settings);
-      checkboxHandler.unselected(settings,selectedNodeList,node);
-      //当前节点
-      checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id), selectedNodeList, 'splice', settings, parentNode);
+      if(typeof id==='string'){
+        node=checkNodeHandler.getNodeById(id,settings);
+        checkboxHandler.unselected(settings,selectedNodeList,node);
+        //当前节点
+        checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id), selectedNodeList, 'splice', settings, parentNode);
+      }else if(typeof id==='object'){
+        node=checkNodeHandler.getNodeById(id.id,settings);
+        checkboxHandler.unselected(settings,selectedNodeList,node);
+        //当前节点
+        checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(id.id,id.name), selectedNodeList, 'splice', settings, parentNode);
+      }
+
     });
   } else if (typeof ids === 'string') {
     //字符串的id'123'
     //处理父节点子节点
-     node=checkNodeHandler.getNodeById(ids,settings);
+    node=checkNodeHandler.getNodeById(ids,settings);
     checkboxHandler.unselected(settings,selectedNodeList,node);
     //当前节点
     checkNodeHandler.pushOrDelForArr(checkNodeHandler.getObj(ids), selectedNodeList, 'splice', settings, parentNode);
   } else {
     //object对象{id:id}
-     node=checkNodeHandler.getNodeById(ids,settings);
+    node=checkNodeHandler.getNodeById(ids,settings);
     checkboxHandler.unselected(settings,selectedNodeList,node);
     //当前节点
     checkNodeHandler.pushOrDelForArr(ids, selectedNodeList, 'splice', settings, parentNode);
