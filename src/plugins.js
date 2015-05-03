@@ -2,33 +2,39 @@
 
 module.exports = [
   {
-    name: 'dnd',
-    // disabled: true,
-    starter: require('./plugins/dnd')
+    name: 'basic',
+    starter: require('./plugins/basic')
   },
   {
-    name: 'treeNode',
-    // disabled: true,
-    starter: require('./plugins/treenode')
+    name: 'fold',
+    disabled: true,
+    starter: require('./plugins/fold')
+  },
+  {
+    name: 'check',
+    disabled: true,
+    starter: require('./plugins/check')
+  },
+  {
+    name: 'dndSort',
+    disabled: true,
+    starter: require('./plugins/dnd-sort')
   },
   {
     name: 'editNode',
-    // disabled: true,
     starter: require('./plugins/edit-node')
   },
   {
     name: 'delNode',
-    // disabled: true,
     starter: require('./plugins/del-node')
   },
   {
     name: 'addNode',
-    // disabled: true,
     starter: require('./plugins/add-node')
   },
   {
     name: 'buttons',
-    // disabled: true,
+    disabled: true,
     starter: require('./plugins/buttons')
   }
 ];

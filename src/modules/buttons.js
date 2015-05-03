@@ -16,7 +16,7 @@ var Button = Widget.extend({
 
     classPrefix: 'buttons',
 
-    template: require('../templates/button.handlebars'),
+    template: require('../templates/buttons.handlebars'),
     buttons: null,
 
     visible: false
@@ -29,6 +29,11 @@ var Button = Widget.extend({
     this.set('model', {
       'buttons': this.get('buttons')
     });
+  },
+
+  useTo: function(node) {
+    this.$('[data-role="edit-node"], [data-role="del-node"]').toggle(node.get('id') !== 0);
+    this.element.insertAfter(node.element.children('.name'));
   }
 
 });

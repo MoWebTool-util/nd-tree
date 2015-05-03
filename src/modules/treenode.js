@@ -10,15 +10,7 @@ var $ = require('jquery');
 var Widget = require('nd-widget');
 var Template = require('nd-template');
 
-var CLS_OPENED = 'opened';
-var CLS_CHECKED = 'checked';
 var CLS_HAS_CHILD = 'has-child';
-var CLS_HAS_CHECKED = 'has-checked';
-var CHECK_STATE_NONE = 0;
-var CHECK_STATE_ALL = 1;
-var CHECK_STATE_HAS = 2;
-var DIRECTION_INSIDE = 1;
-var DIRECTION_OUTSIDE = -1;
 
 var treeNode;
 
@@ -27,14 +19,34 @@ var TreeNode = Widget.extend({
   Implements: [Template],
 
   attrs: {
+    classPrefix: 'ui-tree-node',
 
-    template: require('../templates/single.handlebars'),
+    template: require('../templates/treenode.handlebars'),
 
     parent: null,
     id: null,
     name: null,
     opened: null,
     checked: null,
+    children: null,
+
+    data: {
+      value: null,
+      getter: function(/*val*/) {
+        return {
+          id: this.get('id'),
+          name: this.get('name'),
+          parent: this.get('parent'),
+          children: this.get('children')
+        };
+      },
+      setter: function(val) {
+        var that = this;
+        Object.keys(val).forEach(function(key) {
+          that.set(key, val[key]);
+        });
+      }
+    },
 
     hasChild: false,
 
@@ -42,81 +54,85 @@ var TreeNode = Widget.extend({
 
     model: {},
 
-    insertInto: function(element, parentNode) {
-      parentNode.element.children('ul').append(element);
+    parentNode: null,
+    insertInto: function(/*element, parentNode*/) {
+      // do nothing here, use appendChild instead
+      // parentNode.element.children('ul').append(element);
     }
   },
 
-  initAttrs: function(config) {
-    TreeNode.superclass.initAttrs.call(this, config);
+  _onRenderId: function(id) {
+    this.element.attr('data-node-id', id);
+  },
 
-    var parent = this.get('parent');
-    var parentNode;
-
-    if (parent === -1) {
-      parentNode = treeNode(this.get('parentNode'));
+  _onRenderChildren: function(children) {
+    if (children && children.length) {
+      children.forEach(function(node) {
+        node.parentNode = this;
+        node.tree = this.get('tree');
+        this.insertChild(treeNode(node));
+      }.bind(this));
     } else {
-      parentNode = treeNode('[data-node-id="' + parent + '"]');
-      parentNode.addChild(this);
+      this.set('hasChild', false);
     }
-
-    this.set('parentNode', parentNode);
-
-    this.set('model', {
-      parent: this.get('parent'),
-      id: this.get('id'),
-      name: this.get('name'),
-      opened: this.get('opened'),
-      checked: this.get('checked')
-    });
   },
 
-  _onChangeId: function(id) {
-    this.element.data('node-id', id);
-  },
-
-  _onChangeName: function(name) {
-    this.element.children('.name').text(name);
-  },
-
-  _onRenderOpened: function(opened) {
-    this.toggleOpen(opened);
-  },
-
-  _onRenderChecked: function(checked) {
-    this.toggleCheck(checked);
-  },
-
-  _onChangeParent: function(parent) {
-    this.set('parentNode', treeNode('[data-node-id="' + parent + '"]'));
-  },
-
-  _onChangeParentNode: function(parentNode, originalParentNode) {
-    originalParentNode.removeChild(this);
-
-    parentNode.addChild(this);
-    parentNode.appendNode(this);
-  },
-
-  _onChangeHasChild: function(hasChild) {
+  _onRenderHasChild: function(hasChild) {
     this.element.toggleClass(CLS_HAS_CHILD, hasChild);
   },
 
-  // setup: function() {
-  // },
-
-  initProps: function() {
-    this.valid = this.element.length === 1;
+  _onRenderName: function(name) {
+    this.element.attr('data-node-name', name);
+    this.element.children('.name').text(name);
   },
 
-  addChild: function(child) {
-    this.children()[child.get('id')] = child;
+  _onRenderParent: function(parent) {
+    var parentNode;
 
+    if (parent === -1) {
+      parentNode = this.get('tree');
+    } else {
+      parentNode = this.get('tree').getNode(this.get('parent'));
+    }
+
+    this.set('parentNode', parentNode);
+  },
+
+  _onRenderParentNode: function(parentNode, originalParentNode) {
+    if (originalParentNode) {
+      originalParentNode.removeChild(this);
+    }
+
+    parentNode.insertChild && parentNode.insertChild(this);
+    parentNode.appendChild && parentNode.appendChild(this);
+  },
+
+  setup: function() {
+    var that = this;
+
+    this.get('tree').before('destroy', function() {
+      that.destroy();
+    });
+  },
+
+  insertChild: function(child) {
     this.set('hasChild', true);
+
+    this.get('children').push(child.get('data'));
+    this.children()[child.get('id')] = child;
   },
 
   removeChild: function(child) {
-    delete this.children()[child.get('id')];
+    var id = child.get('id');
+    var children = child.get('children');
+
+    children.forEach(function(child, i) {
+      if (child.id === id) {
+        children.splice(i, 1);
+      }
+    });
+
+    this.children() && delete this.children()[id];
 
     if (!this.hasChild()) {
       this.set('hasChild', false);
@@ -124,14 +140,14 @@ var TreeNode = Widget.extend({
   },
 
   hasChild: function() {
-    return Object.keys(this.children()).length > 0;
+    return this.children() && Object.keys(this.children()).length > 0;
   },
 
   children: function(filter) {
     var children = this.get('childNodes');
 
     if (filter) {
-      // 克隆，以避免误删
+      // 克隆，以免误删
       children = $.extend({}, children);
 
       Object.keys(children).forEach(function(id) {
@@ -171,121 +187,12 @@ var TreeNode = Widget.extend({
     return siblings;
   },
 
-  toggleOpen: function(toOpened) {
-    // if (this.hasChild()) {
-      this.element.toggleClass(CLS_OPENED, toOpened);
-    // }
-  },
-
-  isChecked: function() {
-    return this.element.hasClass(CLS_CHECKED);
-  },
-
-  hasChecked: function() {
-    // 全选或者半选，都算有选中
-    return this.isChecked() || this.element.hasClass(CLS_HAS_CHECKED);
-  },
-
-  setChecked: function(checked) {
-    if (checked === 1) {
-      this.element.removeClass(CLS_HAS_CHECKED);
-      this.element.addClass(CLS_CHECKED);
-    } else if (checked === 0) {
-      this.element.removeClass(CLS_HAS_CHECKED);
-      this.element.removeClass(CLS_CHECKED);
-    } else {
-      this.element.removeClass(CLS_CHECKED);
-      this.element.addClass(CLS_HAS_CHECKED);
-    }
-  },
-
-  toggleCheck: function(toChecked, direction) {
-    if (!this.valid) {
-      return;
-    }
-
-    if (typeof toChecked === 'undefined') {
-      toChecked = this.isChecked() ? CHECK_STATE_NONE : CHECK_STATE_ALL;
-    }
-
-    this.setChecked(toChecked);
-
-    // 向里
-    if (typeof direction === 'undefined' || direction === DIRECTION_INSIDE) {
-      // toggle children check state
-      var children = this.children();
-      Object.keys(children).forEach(function(id) {
-        children[id].toggleCheck(toChecked, DIRECTION_INSIDE);
-      });
-    }
-
-    // 向外
-    if (typeof direction === 'undefined' || direction === DIRECTION_OUTSIDE) {
-      if (toChecked === CHECK_STATE_ALL) {
-        // 如果有未选中或半选
-        if (Object.keys(this.siblings(function(id, node) {
-            return !node.isChecked();
-          })).length) {
-          // 则半选
-          toChecked = CHECK_STATE_HAS;
-        }
-      } else if (toChecked === CHECK_STATE_NONE) {
-        // 如果有选中或半选
-        if (Object.keys(this.siblings(function(id, node) {
-            return node.hasChecked();
-          })).length) {
-          // 半选
-          toChecked = CHECK_STATE_HAS;
-        }
-      }
-
-      // toggle parent check state
-      var parentNode = this.get('parentNode');
-      if (parentNode && parentNode.toggleCheck) {
-        parentNode.toggleCheck(toChecked, DIRECTION_OUTSIDE);
-      }
-    }
-  },
-
-  // 获取选中的子节点
-  getChecked: function(mode) {
-    if (!mode) {
-      var checked = {};
-
-      // 全选/半选
-      var children = this.children(function(id, node) {
-        return node.hasChecked();
-      });
-
-      Object.keys(children).forEach(function(id) {
-        if (children[id].isChecked()) {
-          checked[id] = children[id];
-        }
-
-        $.extend(checked, children[id].getChecked(mode));
-      });
-
-      return checked;
-    }
-
-    return this.children(function(id, node) {
-      return node.isChecked();
-    });
-  },
-
-  // 获取选中的子节点的 ID
-  getCheckedIds: function(mode) {
-    return Object.keys(this.getChecked(mode));
-  },
-
-  appendNode: function(node) {
+  appendChild: function(node) {
     this.element.children('ul').append(node.element);
   },
 
   destroy: function() {
-    if (this.parentNode && this.parentNode.removeChild) {
-      this.parentNode.removeChild(this);
-    }
+    this.get('parentNode').removeChild(this);
 
     TreeNode.superclass.destroy.call(this);
   }
@@ -311,11 +218,22 @@ treeNode = function(node) {
     return;
   }
 
-  return Widget.query(node) ||
+  var _node = Widget.query(node);
+
+  if (_node && _node instanceof TreeNode) {
+    return _node;
+  }
+
   // FOR .ui-tree
-  {
-    element: node
+  return {
+    element: node,
+    _isRoot: true
   };
+};
+
+// extend prototypes
+treeNode.extend = function(items) {
+  TreeNode.implement(items);
 };
 
 module.exports = treeNode;

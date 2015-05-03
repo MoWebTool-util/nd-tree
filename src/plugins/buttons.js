@@ -14,13 +14,17 @@ module.exports = function() {
   plugin.exports = new Buttons({
     buttons: host.get('nodeActions'),
     parentNode: host.element
-  }).render().element;
+  }).render();
 
   host.delegateEvents({
     'click .name': function(e) {
       e.stopPropagation();
 
-      plugin.exports.insertAfter(e.currentTarget);
+      plugin.exports.useTo(host.getNode(e.currentTarget.parentNode.getAttribute('data-node-id')));
     }
+  });
+
+  host.before('destroy', function() {
+    plugin.exports && plugin.exports.destroy();
   });
 };

@@ -23,7 +23,6 @@ var Tree = Widget.extend({
   attrs: {
 
     classPrefix: 'ui-tree',
-
     template: require('./src/templates/tree.handlebars'),
 
     // keyMap: {
@@ -57,7 +56,6 @@ var Tree = Widget.extend({
     nodeList: {
       value: null,
       setter: function(val /*, key*/ ) {
-        console.time('setter')
         var todos = this.translate(val);
         var node;
 
@@ -67,40 +65,52 @@ var Tree = Widget.extend({
         // 最终数据
         var nodeList = [];
 
-        function addChild(pid, nid, node) {
+        function addChild(node) {
           // 统一加 children
           node.children || (node.children = []);
 
           // 缓存，方便快速索引
-          flatList[nid] = node;
+          flatList[node.id] = node;
 
-          if (pid) {
-            if (pid in flatList) {
-              flatList[pid].children.push(node);
+          if (node.parent) {
+            if (node.parent in flatList) {
+              flatList[node.parent].children.push(node);
             } else {
               todos.push(node);
             }
           } else {
+            // top level branches
             nodeList.push(node);
           }
         }
 
         while ((node = todos.shift())) {
-          addChild(node.parent, node.id, node);
+          addChild(node);
         }
-
-        console.timeEnd('setter')
 
         return nodeList;
       }
     },
 
-    checkable: true,
+    foldable: false,
+    checkable: false,
     multiple: true,
+    editable: false,
+    sortable: false,
     opened: true,
-    checked: true,
+    checked: false,
     // tree, branch
-    checkScope: 'tree',
+    // checkScope: 'tree',
+
+    pluginCfg: {
+      fold: {},
+      check: {},
+      buttons: {},
+      editNode: {},
+      delNode: {},
+      addNode: {},
+      dndSort: {}
+    },
 
     //过滤数据
     outFilter: function(data) {
@@ -109,7 +119,7 @@ var Tree = Widget.extend({
 
   },
 
-  events: {},
+  // events: {},
 
   initAttrs: function(config) {
     Tree.superclass.initAttrs.call(this, config);
@@ -121,12 +131,15 @@ var Tree = Widget.extend({
     }
 
     this.set('model', {
-      checkable: this.get('checkable'),
+      foldable: this.get('foldable'),
+      checkable: checkable,
       multiple: this.get('multiple')
     });
   },
 
   setup: function() {
+    Tree.superclass.setup.call(this);
+
     this.set('params', this.get('mode') ? {
       size: 10000,
       page: 0
@@ -145,34 +158,20 @@ var Tree = Widget.extend({
     }
   },
 
-  LIST: function() {
-    var proxy = this.get('proxy');
-    return proxy.LIST.apply(proxy, arguments);
-  },
+  initPlugins: function() {
+    var pluginCfg = this.get('pluginCfg');
 
-  GET: function() {
-    var proxy = this.get('proxy');
-    return proxy.GET.apply(proxy, arguments);
-  },
+    pluginCfg.check.disabled = !this.get('checkable');
+    pluginCfg.fold.disabled = !this.get('foldable');
 
-  PUT: function() {
-    var proxy = this.get('proxy');
-    return proxy.PUT.apply(proxy, arguments);
-  },
+    pluginCfg.buttons.disabled =
+      pluginCfg.editNode.disabled =
+      pluginCfg.delNode.disabled =
+      pluginCfg.addNode.disabled = !this.get('editable');
 
-  PATCH: function() {
-    var proxy = this.get('proxy');
-    return proxy.PATCH.apply(proxy, arguments);
-  },
+    pluginCfg.dndSort.disabled = !this.get('sortable');
 
-  POST: function() {
-    var proxy = this.get('proxy');
-    return proxy.POST.apply(proxy, arguments);
-  },
-
-  DELETE: function() {
-    var proxy = this.get('proxy');
-    return proxy.DELETE.apply(proxy, arguments);
+    Tree.superclass.initPlugins.call(this);
   },
 
   getList: function(options) {
@@ -223,12 +222,10 @@ var Tree = Widget.extend({
     // 拷贝一份数据给 filter
     treeData = this.get('outFilter').call(this, $.extend(true, {}, treeData));
 
-    var items = treeData.items,
-      // uniqueId,
-      nodeList;
+    var items = treeData.items;
+    var nodeList;
 
     if (items && items.length) {
-      // uniqueId = this.get('uniqueId');
       nodeList = items;
     } else {
       nodeList = [0];
@@ -250,92 +247,47 @@ var Tree = Widget.extend({
       });
     }
 
-    if (!this.treeRoot) {
-      this.renderRoot();
+    this.renderTree(nodeList);
+  },
+
+  renderTree: function(nodeList) {
+    if (typeof nodeList === 'undefined') {
+      nodeList = this.get('nodeList');
     }
 
-    this.renderPartial(nodeList);
-  },
-
-  renderRoot: function() {
-    this.treeRoot = treeNode({
-      classPrefix: this.get('classPrefix'),
-      parent: -1,
-      id: 0,
-      name: this.get('treeName'),
-      opened: this.get('opened'),
-      checked: this.get('checked'),
-      parentNode: this.element
-    });
-  },
-
-  renderNode: function(data) {
-    var node = treeNode($.extend({
-      classPrefix: this.get('classPrefix')
-    }, data));
-
-    this.trigger('renderNode', node);
-
-    var that = this;
-
-    if (data.children && data.children.length) {
-      data.children.forEach(function(node) {
-        that.renderNode(node);
+    if (nodeList) {
+      this.treeRoot = this.renderNode({
+        parent: -1,
+        id: 0,
+        name: this.get('treeName'),
+        opened: this.get('opened'),
+        checked: this.get('checked'),
+        children: nodeList,
+        tree: this
       });
     }
   },
 
-  renderPartial: function(nodeList) {
-    this._renderPartial(nodeList);
-  },
+  renderNode: function(data) {
+    data.tree = this;
 
-  _renderPartial: function(nodeList) {
-    console.time('renderPartial')
-
-    nodeList || (nodeList = this.get('nodeList'));
-
-    var that = this;
-
-    nodeList.forEach(function(node) {
-      that.renderNode(node);
-    });
-
-    console.timeEnd('renderPartial')
-  },
-
-  addNodeAction: function(options, index) {
-    var nodeActions = this.get('nodeActions');
-
-    if (typeof index === 'undefined') {
-      nodeActions.push(options);
-    } else {
-      nodeActions.splice(index, 0, options);
+    if (!data.children) {
+      data.children = [];
     }
+
+    return treeNode(data);
+  },
+
+  appendChild: function(node) {
+    this.element.children('ul').append(node.element);
+  },
+
+  removeChild: function(node) {
+    node.element.remove();
   },
 
   getNode: function(id) {
     return treeNode(this.$('[data-node-id="' + id + '"]'));
-  },
-
-  getData: function(id) {
-    var flatList = this.get('flatList');
-
-    return id ? flatList[id] : flatList;
-  },
-
-  setData: function(id, data) {
-    if (typeof data === 'undefined') {
-      data = id;
-      id = data.id;
-    }
-
-    var flatList = this.get('flatList');
-
-    if (data === null) {
-      delete flatList[id];
-    } else {
-      flatList[id] = data;
-    }
   },
 
   translate: function(node) {
@@ -360,70 +312,56 @@ var Tree = Widget.extend({
     return node;
   },
 
-  resortNode: function(data) {
-    data = this.translate(data);
-
-    var id = data.id;
-    var originalData = this.getData(id);
-
-    $.extend(originalData, data);
-
-    this.getNode(id).set('parent', originalData.parent);
-  },
-
   modifyNode: function(data) {
-    data = this.translate(data);
-
-    var id = data.id;
-    var originalData = this.getData(id);
-
-    $.extend(originalData, data);
-
-    this.getNode(id).set('name', originalData.name);
+    this.getNode(data.id).set('data', this.translate(data));
   },
 
   deleteNode: function(id) {
-    var data = this.getData(id);
-    var parentData = this.getData(data.parent);
-
-    if (parentData) {
-      // 从 nodeList 中移除
-      parentData.children.some(function(child, i) {
-        if (child === data) {
-          parentData.children.splice(i, 1);
-          return true;
-        }
-      });
-    }
-
-    // 从 flatList 中移除
-    this.setData(id, null);
-
-    // 从 DOM 中移除
     this.getNode(id).destroy();
   },
 
   insertNode: function(data) {
-    data = this.translate(data);
+    this.renderNode(this.translate(data));
+  },
 
-    var id = data.id;
-    var parent = data.parent;
-    var parentData = this.getData(parent);
+  addNodeAction: function(options, index) {
+    var nodeActions = this.get('nodeActions');
 
-    if (!parentData) {
-      return console.error('父节点不存在');
+    if (typeof index === 'undefined') {
+      nodeActions.push(options);
+    } else {
+      nodeActions.splice(index, 0, options);
     }
+  },
 
-    data.children || (data.children = []);
+  LIST: function() {
+    var proxy = this.get('proxy');
+    return proxy.LIST.apply(proxy, arguments);
+  },
 
-    // 保存到 nodeList
-    parentData.children.push(data);
+  GET: function() {
+    var proxy = this.get('proxy');
+    return proxy.GET.apply(proxy, arguments);
+  },
 
-    // 保存到 flatList
-    this.setData(id, data);
+  PUT: function() {
+    var proxy = this.get('proxy');
+    return proxy.PUT.apply(proxy, arguments);
+  },
 
-    // 生成 node
-    this.renderNode(data);
+  PATCH: function() {
+    var proxy = this.get('proxy');
+    return proxy.PATCH.apply(proxy, arguments);
+  },
+
+  POST: function() {
+    var proxy = this.get('proxy');
+    return proxy.POST.apply(proxy, arguments);
+  },
+
+  DELETE: function() {
+    var proxy = this.get('proxy');
+    return proxy.DELETE.apply(proxy, arguments);
   }
 
 });
