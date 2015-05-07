@@ -14,6 +14,8 @@ var Template = require('nd-template');
 
 var treeNode = require('./src/modules/treenode');
 
+var treeNodeId = 1;
+
 var Tree = Widget.extend({
 
   Implements: [Template],
@@ -288,6 +290,10 @@ var Tree = Widget.extend({
 
   getNode: function(id) {
     return treeNode(this.$('[data-node-id="' + id + '"]'));
+  },
+
+  getData: function() {
+    return this.treeRoot.get('data');
   },
 
   translate: function(node) {

@@ -37,14 +37,21 @@ var TreeNode = Widget.extend({
           id: this.get('id'),
           name: this.get('name'),
           parent: this.get('parent'),
-          children: this.get('children')
+          // children: this.get('children')
+          // 真实数据
+          children: (function(children) {
+            return Object.keys(children).map(function(id) {
+              return children[id].get('data');
+            });
+          })(this.children())
         };
       },
       setter: function(val) {
-        var that = this;
         Object.keys(val).forEach(function(key) {
-          that.set(key, val[key]);
-        });
+          this.set(key, val[key]);
+        }.bind(this));
+
+        return this;
       }
     },
 
@@ -67,9 +74,15 @@ var TreeNode = Widget.extend({
 
   _onRenderChildren: function(children) {
     if (children && children.length) {
-      children.forEach(function(node) {
+      children.forEach(function(node, i) {
         node.parentNode = this;
         node.tree = this.get('tree');
+        if (typeof node.parent === 'undefined') {
+          node.parent = this.get('id');
+        }
+        if (typeof node.id === 'undefined') {
+          node.id = [node.parent, i].join('-');
+        }
         this.insertChild(treeNode(node));
       }.bind(this));
     } else {
@@ -117,26 +130,22 @@ var TreeNode = Widget.extend({
 
   insertChild: function(child) {
     this.set('hasChild', true);
-
-    this.get('children').push(child.get('data'));
     this.children()[child.get('id')] = child;
   },
 
   removeChild: function(child) {
     var id = child.get('id');
-    var children = child.get('children');
+    var children = this.children();
 
-    children.forEach(function(child, i) {
-      if (child.id === id) {
-        children.splice(i, 1);
-      }
-    });
-
-    this.children() && delete this.children()[id];
+    children && delete children[id];
 
     if (!this.hasChild()) {
       this.set('hasChild', false);
     }
+  },
+
+  getLevel: function() {
+    return this.element.parents('li', '.ui-tree').length;
   },
 
   hasChild: function() {
@@ -192,7 +201,8 @@ var TreeNode = Widget.extend({
   },
 
   destroy: function() {
-    this.get('parentNode').removeChild(this);
+    var parentNode = this.get('parentNode');
+    parentNode && parentNode.removeChild(this);
 
     TreeNode.superclass.destroy.call(this);
   }

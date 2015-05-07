@@ -32,7 +32,9 @@ var Button = Widget.extend({
   },
 
   useTo: function(node) {
-    this.$('[data-role="edit-node"], [data-role="del-node"]').toggle(node.get('id') !== 0);
+    this.$('[data-role="edit-node"], [data-role="del-node"]')
+        .toggle(node.get('id') !== 0);
+
     this.element.insertAfter(node.element.children('.name'));
   }
 
