@@ -14,8 +14,6 @@ var Template = require('nd-template');
 
 var treeNode = require('./src/modules/treenode');
 
-var treeNodeId = 1;
-
 var Tree = Widget.extend({
 
   Implements: [Template],
