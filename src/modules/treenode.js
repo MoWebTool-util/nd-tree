@@ -144,7 +144,7 @@ var TreeNode = Widget.extend({
   },
 
   removeChild: function(child) {
-    delete this.childNodes[child.get('id')];
+    this.childNodes && delete this.childNodes[child.get('id')];
 
     if (!this.hasChild()) {
       this.set('hasChild', false);
