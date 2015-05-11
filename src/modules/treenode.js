@@ -14,6 +14,10 @@ var CLS_HAS_CHILD = 'has-child';
 
 var treeNode;
 
+var makeId = function(pid, index) {
+  return [pid, index].join('-');
+};
+
 var TreeNode = Widget.extend({
 
   Implements: [Template],
@@ -43,7 +47,7 @@ var TreeNode = Widget.extend({
             return Object.keys(children).map(function(id) {
               return children[id].get('data');
             });
-          })(this.children())
+          })(this.childNodes || {})
         };
       },
       setter: function(val) {
@@ -56,8 +60,6 @@ var TreeNode = Widget.extend({
     },
 
     hasChild: false,
-
-    childNodes: {},
 
     model: {},
 
@@ -81,7 +83,7 @@ var TreeNode = Widget.extend({
           node.parent = this.get('id');
         }
         if (typeof node.id === 'undefined') {
-          node.id = [node.parent, i].join('-');
+          node.id = makeId(node.parent, i);
         }
         this.insertChild(treeNode(node));
       }.bind(this));
@@ -106,6 +108,10 @@ var TreeNode = Widget.extend({
       parentNode = this.get('tree');
     } else {
       parentNode = this.get('tree').getNode(this.get('parent'));
+
+      if (!this.get('id')) {
+        this.set('id', makeId(parentNode.get('id'), Object.keys(parentNode.childNodes).length));
+      }
     }
 
     this.set('parentNode', parentNode);
@@ -120,6 +126,10 @@ var TreeNode = Widget.extend({
     parentNode.appendChild && parentNode.appendChild(this);
   },
 
+  initProps: function() {
+    this.childNodes = {};
+  },
+
   setup: function() {
     var that = this;
 
@@ -130,14 +140,11 @@ var TreeNode = Widget.extend({
 
   insertChild: function(child) {
     this.set('hasChild', true);
-    this.children()[child.get('id')] = child;
+    this.childNodes[child.get('id')] = child;
   },
 
   removeChild: function(child) {
-    var id = child.get('id');
-    var children = this.children();
-
-    children && delete children[id];
+    delete this.childNodes[child.get('id')];
 
     if (!this.hasChild()) {
       this.set('hasChild', false);
@@ -149,11 +156,11 @@ var TreeNode = Widget.extend({
   },
 
   hasChild: function() {
-    return this.children() && Object.keys(this.children()).length > 0;
+    return Object.keys(this.childNodes).length > 0;
   },
 
   children: function(filter) {
-    var children = this.get('childNodes');
+    var children = this.childNodes;
 
     if (filter) {
       // 克隆，以免误删
