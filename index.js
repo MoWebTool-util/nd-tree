@@ -56,7 +56,7 @@ var Tree = Widget.extend({
     nodeList: {
       value: null,
       setter: function(val /*, key*/ ) {
-        var todos = this.translate(val);
+        var todos = (!val || val.hacked) ? [] : this.translate(val);
         var node;
 
         // 缓存索引
@@ -105,7 +105,8 @@ var Tree = Widget.extend({
     pluginCfg: {
       fold: {},
       check: {},
-      buttons: {},
+      crud: {},
+      // save: {},
       editNode: {},
       delNode: {},
       addNode: {},
@@ -164,7 +165,7 @@ var Tree = Widget.extend({
     pluginCfg.check.disabled = !this.get('checkable');
     pluginCfg.fold.disabled = !this.get('foldable');
 
-    pluginCfg.buttons.disabled =
+    pluginCfg.crud.disabled =
       pluginCfg.editNode.disabled =
       pluginCfg.delNode.disabled =
       pluginCfg.addNode.disabled = !this.get('editable');

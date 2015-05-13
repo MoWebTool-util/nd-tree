@@ -33,8 +33,13 @@ module.exports = [
     starter: require('./plugins/add-node')
   },
   {
-    name: 'buttons',
+    name: 'crud',
     disabled: true,
-    starter: require('./plugins/buttons')
+    starter: require('./plugins/crud')
+  },
+  {
+    name: 'save',
+    disabled: true,
+    starter: require('./plugins/save')
   }
 ];

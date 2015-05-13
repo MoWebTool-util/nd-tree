@@ -156,7 +156,7 @@ var TreeNode = Widget.extend({
   },
 
   hasChild: function() {
-    return Object.keys(this.childNodes).length > 0;
+    return this.childNodes && Object.keys(this.childNodes).length > 0;
   },
 
   children: function(filter) {
