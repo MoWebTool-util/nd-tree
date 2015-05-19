@@ -41,5 +41,9 @@ module.exports = [
     name: 'save',
     disabled: true,
     starter: require('./plugins/save')
+  },
+  {
+    name: 'interact',
+    starter: require('./plugins/interact')
   }
 ];

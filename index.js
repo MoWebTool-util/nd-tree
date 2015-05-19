@@ -138,27 +138,6 @@ var Tree = Widget.extend({
     });
   },
 
-  setup: function() {
-    Tree.superclass.setup.call(this);
-
-    this.set('params', this.get('mode') ? {
-      size: 10000,
-      page: 0
-    } : {
-      $limit: 10000,
-      $offset: 0
-    });
-
-    if (!this.get('proxy')) {
-      console.error('请设置数据源（proxy）');
-    }
-
-    if (this.get('autoload')) {
-      // 取列表
-      this.getList();
-    }
-  },
-
   initPlugins: function() {
     var pluginCfg = this.get('pluginCfg');
 
@@ -173,6 +152,53 @@ var Tree = Widget.extend({
     pluginCfg.dndSort.disabled = !this.get('sortable');
 
     Tree.superclass.initPlugins.call(this);
+  },
+
+  setup: function() {
+    var params;
+
+    switch (this.get('mode')) {
+      case 2:
+        params = {};
+        break;
+      case 1:
+        params = {
+          size: 10,
+          page: 0
+        };
+        break;
+      default:
+        params = {
+          $limit: 10,
+          $offset: 0
+        };
+    }
+
+    this.set('params', $.extend(params, this.get('params')));
+
+    this.set('params', this.get('mode') ? {
+      size: 10000,
+      page: 0
+    } : {
+      $limit: 10000,
+      $offset: 0
+    });
+
+    var proxy = this.get('proxy');
+
+    if (!proxy) {
+      console.error('请设置数据源（proxy）');
+    } else {
+      ['LIST', 'GET', 'PUT', 'PATCH', 'POST', 'DELETE']
+      .forEach(function(method) {
+        proxy[method] && (this[method] = proxy[method].bind(proxy));
+      }, this);
+    }
+
+    if (this.get('autoload')) {
+      // 取列表
+      this.getList();
+    }
   },
 
   getList: function(options) {

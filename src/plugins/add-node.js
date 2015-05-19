@@ -14,8 +14,7 @@ var treeNode = require('../modules/treenode');
 
 module.exports = function() {
   var plugin = this,
-    host = plugin.host,
-    options = plugin.options || {};
+    host = plugin.host;
 
   function makeForm(data) {
     return new FormExtra($.extend(true, {
@@ -25,7 +24,7 @@ module.exports = function() {
       formData: data,
       proxy: host.get('proxy'),
       parentNode: host.get('parentNode')
-    }, options))
+    }, plugin.getOptions('view')))
     .on('formCancel', function() {
       plugin.trigger('hide', this);
     })
@@ -37,13 +36,12 @@ module.exports = function() {
     });
   }
 
-  host.addNodeAction($.extend({
-    'role': 'add-node',
-    'text': '增加子节点'
-  }, options.button), 0);
-
-  // 移除参数
-  delete options.button;
+  (function(button) {
+    host.addNodeAction($.extend({
+      'role': 'add-node',
+      'text': '增加子节点'
+    }, button), button && button.index || 0);
+  })(plugin.getOptions('button'));
 
   host.delegateEvents({
     'click [data-role="add-node"]': function(e) {
@@ -64,15 +62,18 @@ module.exports = function() {
   });
 
   plugin.on('show', function(form) {
-    // 通知就绪
-    // plugin.ready();
+    if (!this.getOptions('interact')) {
+      host.element.hide();
+    }
 
-    host.element.hide();
     form.element.show();
   });
 
   plugin.on('hide', function(form) {
-    host.element.show();
+    if (!this.getOptions('interact')) {
+      host.element.show();
+    }
+
     form.destroy();
     delete plugin.exports;
   });
