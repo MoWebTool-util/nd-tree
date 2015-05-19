@@ -138,6 +138,19 @@ var Tree = Widget.extend({
     });
   },
 
+  initProps: function() {
+    var proxy = this.get('proxy');
+
+    if (!proxy) {
+      console.error('请设置数据源（proxy）');
+    } else {
+      ['LIST', 'GET', 'PUT', 'PATCH', 'POST', 'DELETE']
+      .forEach(function(method) {
+        proxy[method] && (this[method] = proxy[method].bind(proxy));
+      }, this);
+    }
+  },
+
   initPlugins: function() {
     var pluginCfg = this.get('pluginCfg');
 
@@ -175,25 +188,6 @@ var Tree = Widget.extend({
     }
 
     this.set('params', $.extend(params, this.get('params')));
-
-    this.set('params', this.get('mode') ? {
-      size: 10000,
-      page: 0
-    } : {
-      $limit: 10000,
-      $offset: 0
-    });
-
-    var proxy = this.get('proxy');
-
-    if (!proxy) {
-      console.error('请设置数据源（proxy）');
-    } else {
-      ['LIST', 'GET', 'PUT', 'PATCH', 'POST', 'DELETE']
-      .forEach(function(method) {
-        proxy[method] && (this[method] = proxy[method].bind(proxy));
-      }, this);
-    }
 
     if (this.get('autoload')) {
       // 取列表
@@ -363,36 +357,6 @@ var Tree = Widget.extend({
     } else {
       nodeActions.splice(index, 0, options);
     }
-  },
-
-  LIST: function() {
-    var proxy = this.get('proxy');
-    return proxy.LIST.apply(proxy, arguments);
-  },
-
-  GET: function() {
-    var proxy = this.get('proxy');
-    return proxy.GET.apply(proxy, arguments);
-  },
-
-  PUT: function() {
-    var proxy = this.get('proxy');
-    return proxy.PUT.apply(proxy, arguments);
-  },
-
-  PATCH: function() {
-    var proxy = this.get('proxy');
-    return proxy.PATCH.apply(proxy, arguments);
-  },
-
-  POST: function() {
-    var proxy = this.get('proxy');
-    return proxy.POST.apply(proxy, arguments);
-  },
-
-  DELETE: function() {
-    var proxy = this.get('proxy');
-    return proxy.DELETE.apply(proxy, arguments);
   }
 
 });
