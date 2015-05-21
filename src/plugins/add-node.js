@@ -14,7 +14,8 @@ var treeNode = require('../modules/treenode');
 
 module.exports = function() {
   var plugin = this,
-    host = plugin.host;
+    host = plugin.host,
+    awaiting;
 
   function makeForm(data) {
     return new FormExtra($.extend(true, {
@@ -79,6 +80,12 @@ module.exports = function() {
   });
 
   plugin.on('submit', function(data) {
+    if (awaiting) {
+      return;
+    }
+
+    // 添加用于阻止多次点击
+    awaiting = true;
     host.POST({
         data: data
       })
@@ -91,6 +98,9 @@ module.exports = function() {
       })
       .fail(function(error) {
         Alert.show(error);
+      })
+      .always(function() {
+        awaiting = false;
       });
   });
 

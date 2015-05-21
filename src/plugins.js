@@ -44,6 +44,7 @@ module.exports = [
   },
   {
     name: 'interact',
+    priority: 0,
     starter: require('./plugins/interact')
   }
 ];
