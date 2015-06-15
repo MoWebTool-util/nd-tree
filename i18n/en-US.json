@@ -1,0 +1,10 @@
+{
+  "保存": "Save",
+  "删除": "Delete",
+  "增加子节点": "New child node",
+  "拖放排序": "Drag sort",
+  "根节点": "Root node",
+  "确定删除？": "Delete?",
+  "编辑节点": "Edit node",
+  "请设置数据源（proxy）": "Please set datasource (proxy)"
+}
