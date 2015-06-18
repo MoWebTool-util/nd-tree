@@ -1,6 +1,6 @@
 /**
  * @module: Tree
- * @author: crossjs <liwenfu@crossjs.com> - 2015-4-22 13:05:11
+ * @author: crossjs <liwenfu@crossjs.com>
  */
 
 'use strict';

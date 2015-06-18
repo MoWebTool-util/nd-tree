@@ -1,11 +1,9 @@
 /**
- * @module: nd-tree
- * @author: crossjs <liwenfu@crossjs.com> - 2015-02-27 13:47:55
+ * @module: Tree
+ * @author: crossjs <liwenfu@crossjs.com>
  */
 
 'use strict';
-
-// var $ = require('jquery');
 
 var Alert = require('nd-alert');
 
@@ -30,32 +28,36 @@ module.exports = function() {
     if (interact.type === 'dialog') {
       plugin.setOptions('view', {
         className: 'ui-view-dialog',
-        beforeRender: function() {
-          var view = this;
+        beforeSetup: function() {
+          this.before('render', function() {
+            var view = this;
 
-          view.dialog = new Alert({
-            // closeTpl: '',
-            confirmTpl: '',
-            message: '',
-            title: interact.title,
-            hideOnKeyEscape: false,
-            events: {
-              // override
-              'click [data-role=close]': function(e) {
-                e.preventDefault();
-                plugin.trigger('hide', view);
+            view.dialog = new Alert({
+              // closeTpl: '',
+              confirmTpl: '',
+              message: '',
+              title: interact.title,
+              hideOnKeyEscape: false,
+              events: {
+                // override
+                'click [data-role=close]': function(e) {
+                  e.preventDefault();
+                  plugin.trigger('hide', view);
+                }
               }
-            }
-          }).render();
+            }).render();
 
-          // change parentNode
-          view.set('parentNode', view.dialog.$('[data-role="message"]'));
-        },
-        afterRender: function() {
-          this.dialog.show();
-        },
-        beforeDestroy: function() {
-          this.dialog.hide();
+            // change parentNode
+            view.set('parentNode', view.dialog.$('[data-role="message"]'));
+          });
+
+          this.after('render', function() {
+            this.dialog.show();
+          });
+
+          this.before('destroy', function() {
+            this.dialog.hide();
+          });
         }
       });
     }

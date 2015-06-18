@@ -6,6 +6,10 @@ exports.makeButton = function(options) {
     ' class="button-' + options.role + '"' +
     // role
     ' data-role="' + options.role + '"' +
+    // tips
+    (options.tips ? ' data-tips="' + options.tips + '"' : '') +
+    // hidden
+    (options.hidden ? ' hidden' : '') +
     // disabled
     (options.disabled ? ' disabled' : '') +
     '>' + options.text + '</button>';
