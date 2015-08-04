@@ -115,11 +115,11 @@ module.exports = function() {
 
     /**
      * 获取选中的子节点
-     * @param  {number} mode 0：递归获取所有子节点 1：直属子节点
+     * @param  {number} mode 0：递归获取所有子节点 1：直属子节点 2:子节点都被选中，只返回根节点
      * @return {object}      节点集合
      */
     getChecked: function(mode) {
-      if (!mode) {
+      if (!mode || mode === 2) {
         var checked = {};
 
         // 全选/半选
@@ -128,11 +128,13 @@ module.exports = function() {
         });
 
         Object.keys(children).forEach(function(id) {
-          if (children[id].isChecked()) {
+          var isChecked = children[id].isChecked();
+
+          if (isChecked) {
             checked[id] = children[id];
           }
 
-          $.extend(checked, children[id].getChecked(mode));
+          (!mode || !isChecked) && $.extend(checked, children[id].getChecked(mode));
         });
 
         return checked;
@@ -166,7 +168,12 @@ module.exports = function() {
     'click .choose': function(e) {
       e.stopPropagation();
 
-      treeNode($(e.currentTarget).parent()).toggleCheck();
+      var tn = treeNode($(e.currentTarget).parent());
+      var checked =tn.isChecked();
+
+      host.trigger(checked ? 'uncheck' : 'check', tn);
+      tn.toggleCheck();
+      host.trigger(checked ? 'afterUncheck' : 'afterCheck', tn);
     }
   });
 
