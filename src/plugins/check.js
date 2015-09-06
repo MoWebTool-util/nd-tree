@@ -9,11 +9,12 @@ var $ = require('jquery');
 
 var treeNode = require('../modules/treenode');
 
-module.exports = function() {
+module.exports = function () {
   var plugin = this,
     host = plugin.host;
 
   var nodeChecked;
+  var nodeCheckedIsParents;
   var multipleChk = host.get('multiple');
 
   var CLS_CHECKED = 'checked';
@@ -27,14 +28,14 @@ module.exports = function() {
 
   treeNode.extend({
 
-    _onRenderChecked: function(checked) {
+    _onRenderChecked: function (checked) {
       // async for nodes ready
-      setTimeout(function() {
+      setTimeout(function () {
         this.toggleCheck(checked ? CHECK_STATE_ALL : CHECK_STATE_NONE);
       }.bind(this), 80);
     },
 
-    toggleCheck: function(toChecked, direction) {
+    toggleCheck: function (toChecked, direction) {
       if (typeof toChecked === 'undefined') {
         toChecked = this.isChecked() ? CHECK_STATE_NONE : CHECK_STATE_ALL;
       }
@@ -47,7 +48,7 @@ module.exports = function() {
 
         if (toCheckedOut === CHECK_STATE_ALL) {
           // 如果有未选中或半选
-          if (Object.keys(this.siblings(function(id, node) {
+          if (!multipleChk || Object.keys(this.siblings(function (id, node) {
               return !node.isChecked();
             })).length) {
             // 则半选
@@ -55,7 +56,7 @@ module.exports = function() {
           }
         } else if (toCheckedOut === CHECK_STATE_NONE) {
           // 如果有选中或半选
-          if (Object.keys(this.siblings(function(id, node) {
+          if (Object.keys(this.siblings(function (id, node) {
               return node.hasChecked();
             })).length) {
             // 半选
@@ -66,45 +67,48 @@ module.exports = function() {
         // toggle parent check state
         var parentNode = this.get('parentNode');
         if (parentNode && parentNode.toggleCheck) {
+          if (parentNode === nodeChecked) {
+            nodeCheckedIsParents = true;
+          }
           parentNode.toggleCheck(toCheckedOut, DIRECTION_OUTSIDE);
         }
       }
 
       if (!multipleChk) {
+        //-1,-1,undefined
         if (typeof direction === 'undefined') {
-          if (nodeChecked && nodeChecked !== this) {
+          if (nodeChecked && nodeChecked !== this && !nodeCheckedIsParents) {
             nodeChecked.toggleCheck(CHECK_STATE_NONE, DIRECTION_OUTSIDE);
           }
           nodeChecked = this;
+          nodeCheckedIsParents = false;
         }
-
-        return;
-      }
-
-      // 向里
-      if (typeof direction === 'undefined' || direction === DIRECTION_INSIDE) {
-        // toggle children check state
-        var children = this.children();
-        Object.keys(children).forEach(function(id) {
-          children[id].toggleCheck(toChecked, DIRECTION_INSIDE);
-        });
+      } else {
+        // 向里
+        if (typeof direction === 'undefined' || direction === DIRECTION_INSIDE) {
+          // toggle children check state
+          var children = this.children();
+          Object.keys(children).forEach(function (id) {
+            children[id].toggleCheck(toChecked, DIRECTION_INSIDE);
+          });
+        }
       }
     },
 
-    isChecked: function() {
+    isChecked: function () {
       return this.element.hasClass(CLS_CHECKED);
     },
 
-    hasChecked: function() {
+    hasChecked: function () {
       // 全选或者半选，都算有选中
       return this.isChecked() || this.element.hasClass(CLS_HAS_CHECKED);
     },
 
-    setChecked: function(checked) {
-      if (checked === 1) {
+    setChecked: function (checked) {
+      if (checked === CHECK_STATE_ALL) {
         this.element.removeClass(CLS_HAS_CHECKED);
         this.element.addClass(CLS_CHECKED);
-      } else if (checked === 0) {
+      } else if (checked === CHECK_STATE_NONE) {
         this.element.removeClass(CLS_HAS_CHECKED);
         this.element.removeClass(CLS_CHECKED);
       } else {
@@ -115,25 +119,29 @@ module.exports = function() {
 
     /**
      * 获取选中的子节点
-     * @param  {number} mode 0：递归获取所有子节点 1：直属子节点 2:子节点都被选中，只返回根节点
+     * @param  {number} mode
+     * 0：递归获取所有子节点
+     * 1：直属子节点
+     * 2:子节点都被选中，只返回根节点
      * @return {object}      节点集合
      */
-    getChecked: function(mode) {
-      
+    getChecked: function (mode) {
       var checked = {};
       if (this.isChecked()) {
         checked[this.get('id')] = this;
-        return checked;
+        if(mode===2){
+          return checked;
+        }
       }
 
       if (!mode || mode === 2) {
 
         // 全选/半选
-        var children = this.children(function(id, node) {
+        var children = this.children(function (id, node) {
           return node.hasChecked();
-        });
+        })
 
-        Object.keys(children).forEach(function(id) {
+        Object.keys(children).forEach(function (id) {
           var isChecked = children[id].isChecked();
 
           if (isChecked) {
@@ -146,7 +154,7 @@ module.exports = function() {
         return checked;
       }
 
-      return this.children(function(id, node) {
+      return this.children(function (id, node) {
         return node.isChecked();
       });
     },
@@ -156,26 +164,26 @@ module.exports = function() {
      * @param  {number} mode 0：递归获取所有子节点 1：直属子节点
      * @return {array}       包含 IDs 的数组
      */
-    getCheckedIds: function(mode) {
+    getCheckedIds: function (mode) {
       return Object.keys(this.getChecked(mode));
     }
 
   });
 
-  host.getChecked = function(mode) {
+  host.getChecked = function (mode) {
     return host.treeRoot.getChecked(mode);
   };
 
-  host.getCheckedIds = function(mode) {
+  host.getCheckedIds = function (mode) {
     return host.treeRoot.getCheckedIds(mode);
   };
 
   host.delegateEvents({
-    'click .choose': function(e) {
+    'click .choose': function (e) {
       e.stopPropagation();
 
       var tn = treeNode($(e.currentTarget).parent());
-      var checked =tn.isChecked();
+      var checked = tn.isChecked();
 
       host.trigger(checked ? 'uncheck' : 'check', tn);
       tn.toggleCheck();
