@@ -119,8 +119,14 @@ module.exports = function() {
      * @return {object}      节点集合
      */
     getChecked: function(mode) {
+      
+      var checked = {};
+      if (this.isChecked()) {
+        checked[this.get('id')] = this;
+        return checked;
+      }
+
       if (!mode || mode === 2) {
-        var checked = {};
 
         // 全选/半选
         var children = this.children(function(id, node) {
