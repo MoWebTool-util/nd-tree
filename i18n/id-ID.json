@@ -1,0 +1,10 @@
+{
+  "保存": "simpan",
+  "删除": "Hapus",
+  "增加子节点": "anak node baru",
+  "拖放排序": "tarik urutan",
+  "根节点": " node akar",
+  "确定删除？": "hapus?",
+  "编辑节点": "ubah node",
+  "请设置数据源（proxy）": "masukan sumber data (proxy)"
+}
