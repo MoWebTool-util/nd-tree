@@ -1,6 +1,6 @@
 /**
- * @module: Tree
- * @author: crossjs <liwenfu@crossjs.com>
+ * @module Tree
+ * @author crossjs <liwenfu@crossjs.com>
  */
 
 'use strict';

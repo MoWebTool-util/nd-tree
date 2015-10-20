@@ -1,7 +1,6 @@
 /**
- * Description: Tree
- * Author: liwenfu <liwenfu@crossjs.com>
- * Date: 2015-4-22 13:05:11
+ * @module Tree
+ * @author crossjs <liwenfu@crossjs.com>
  */
 
 'use strict';
