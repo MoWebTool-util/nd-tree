@@ -32,11 +32,9 @@ module.exports = function() {
     .on('formCancel', function() {
       plugin.trigger('hide', this);
     })
-    .on('formSubmit', function() {
+    .on('formSubmit', function(data) {
       // 调用队列
-      this.submit(function(data) {
         plugin.trigger('submit', data);
-      });
     });
   }
 
