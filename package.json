@@ -1,6 +1,6 @@
 {
   "name": "nd-tree",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "a simple tree support fold and expand",
   "keywords": [],
   "homepage": "https://github.com/ndfront/nd-tree",
@@ -22,10 +22,6 @@
     "dependencies": {
       "handlebars-runtime": "3.0.1",
       "jquery": "1.11.1",
-      "nd-alert": "1.0.0",
-      "nd-confirm": "1.0.0",
-      "nd-dnd": "1.0.0",
-      "nd-form-extra": "1.0.0",
       "nd-widget": "1.0.0",
       "nd-template": "1.0.0"
     },

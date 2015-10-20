@@ -5,24 +5,31 @@
 
 'use strict';
 
-var $ = require('jquery');
-
-var Alert = require('nd-alert');
 var Widget = require('nd-widget');
 var Template = require('nd-template');
 
-var treeNode = require('./src/modules/treenode');
+var treeNode = require('./src/treenode');
+
+var enums = require('./src/enums');
+
+var CHECKED_NODE_TOKEN = '__CHECKED_NODE';
+var SELECTED_NODE_TOKEN = '__SELECTED_ELEMENT';
+var RENDERED_NODES_TOKEN = '__RENDERED_NODES';
+
+/**
+ * @event Tree#nodeChanged
+ */
 
 var Tree = Widget.extend({
 
-  Implements: [Template],
+  Statics: enums,
 
-  Plugins: require('./src/plugins'),
+  Implements: [Template],
 
   attrs: {
 
     classPrefix: 'ui-tree',
-    template: require('./src/templates/tree.handlebars'),
+    template: require('./src/tree.handlebars'),
 
     // keyMap: {
     //   id: 'node_id',
@@ -35,88 +42,80 @@ var Tree = Widget.extend({
     // 行处理
     nodeActions: [],
 
-    // proxy: null,
-
-    // 0: mysql or 1: mongodb
-    mode: 0,
-
-    params: {
-      $count: true
-    },
+    async: false,
 
     autoload: true,
 
-    // 服务端返回的原始数据
-    treeData: null,
+    //数据源
+    dataSource: {
+      value: null,
+      getter: function(val) {
+        if (typeof val !== 'function') {
+          return function(query, done) {
+            done(val);
+          };
+        }
 
-    flatList: {},
+        return val;
+      }
+    },
 
     // 解析后的数据列表
-    nodeList: {
+    dataList: {
       value: null,
       setter: function(val /*, key*/ ) {
-        var todos = (!val || val.hacked) ? [] : this.translate(val);
-        var node;
+        var todos = !val ? [] : this.translate(val);
+
+        // 异步树，逐级获取，直接返回
+        if (this.get('async')) {
+          todos.forEach(function(todo) {
+            todo.children || (todo.children = []);
+          });
+          return todos;
+        }
+
+        // 同步树,一次性获取所有节点
 
         // 缓存索引
-        var flatList = this.get('flatList');
+        var stackIds = {};
 
         // 最终数据
-        var nodeList = [];
+        var dataList = [];
 
         function addChild(node) {
           // 统一加 children
           node.children || (node.children = []);
 
           // 缓存，方便快速索引
-          flatList[node.id] = node;
+          stackIds[node.id] = node;
 
           if (node.parent) {
-            if (node.parent in flatList) {
-              flatList[node.parent].children.push(node);
+            if (node.parent in stackIds) {
+              stackIds[node.parent].children.push(node);
             } else {
               todos.push(node);
             }
           } else {
             // top level branches
-            nodeList.push(node);
+            dataList.push(node);
           }
         }
+
+        var node;
 
         while ((node = todos.shift())) {
           addChild(node);
         }
 
-        return nodeList;
+        return dataList;
       }
     },
 
     foldable: false,
     checkable: false,
     multiple: true,
-    editable: false,
-    sortable: false,
-    opened: true,
-    checked: false,
-    // tree, branch
-    // checkScope: 'tree',
-
-    pluginCfg: {
-      fold: {},
-      check: {},
-      crud: {},
-      // save: {},
-      editNode: {},
-      delNode: {},
-      addNode: {},
-      dndSort: {}
-    },
-
-    //过滤数据
-    outFilter: function(data) {
-      return data;
-    }
-
+    opened: false,
+    checked: false
   },
 
   // events: {},
@@ -130,6 +129,12 @@ var Tree = Widget.extend({
       this.set('multiple', false);
     }
 
+    var foldable = this.get('foldable');
+
+    if (!foldable) {
+      this.set('opened', true);
+    }
+
     this.set('model', {
       foldable: this.get('foldable'),
       checkable: checkable,
@@ -138,164 +143,51 @@ var Tree = Widget.extend({
   },
 
   initProps: function() {
-    var proxy = this.get('proxy');
-
-    if (!proxy) {
-      console.error('请设置数据源（proxy）');
-    } else {
-      ['LIST', 'GET', 'PUT', 'PATCH', 'POST', 'DELETE']
-      .forEach(function(method) {
-        proxy[method] && (this[method] = proxy[method].bind(proxy));
-      }, this);
-    }
-  },
-
-  initPlugins: function() {
-    var pluginCfg = this.get('pluginCfg');
-
-    pluginCfg.check.disabled = !this.get('checkable');
-    pluginCfg.fold.disabled = !this.get('foldable');
-
-    pluginCfg.crud.disabled =
-      pluginCfg.editNode.disabled =
-      pluginCfg.delNode.disabled =
-      pluginCfg.addNode.disabled = !this.get('editable');
-
-    pluginCfg.dndSort.disabled = !this.get('sortable');
-
-    Tree.superclass.initPlugins.call(this);
+    this[RENDERED_NODES_TOKEN] = {};
   },
 
   setup: function() {
-    var params;
-
-    switch (this.get('mode')) {
-      case 2:
-        params = {};
-        break;
-      case 1:
-        params = {
-          size: 10,
-          page: 0
-        };
-        break;
-      default:
-        params = {
-          $limit: 10,
-          $offset: 0
-        };
-    }
-
-    this.set('params', $.extend(params, this.get('params')));
-
-    if (this.get('autoload')) {
-      // 取列表
-      this.getList();
-    }
+    this.treeRoot = this.renderNode({
+      parent: -1,
+      id: 0,
+      name: this.get('treeName'),
+      opened: this.get('opened'),
+      checked: this.get('checked'),
+      foldable: this.get('foldable'),
+      checkable: this.get('checkable'),
+      multiple: this.get('multiple'),
+      children: []
+    });
   },
 
-  getList: function(options) {
+  getDataList: function(parent, callback) {
     var that = this;
 
-    if (options) {
-      if (options.data) {
-        this.set('params', options.data);
-      }
-    } else {
-      options = {};
-    }
-
-    var params = options.data = $.extend({}, this.get('params'));
-
-    Object.keys(params).forEach(function(key) {
-      // 空字符串不提交查询
-      if (params[key] === '') {
-        delete params[key];
-      }
+    // async
+    that.get('dataSource')(parent, function(data) {
+      var hasChild = !!data.length;
+      // override
+      that.set('dataList', data, {
+        override: true
+      });
+      // callback
+      callback && callback(hasChild);
     });
-
-    this.LIST(options)
-      .done(function(data) {
-        // offset 溢出
-        if (data.count && !data.items.length) {
-          // 到最后一页
-          that.getList({
-            data: that.get('mode') ? {
-              page: (Math.ceil(data.count / params.size) - 1)
-            } : {
-              $offset: (Math.ceil(data.count / params.$limit) - 1) * params.$limit
-            }
-          });
-        } else {
-          that.set('treeData', data);
-        }
-      })
-      .fail(function(error) {
-        Alert.show(error);
-      });
   },
 
-  _onRenderTreeData: function(treeData) {
-    // 保存原始数据
-    this.set('originData', treeData);
-
-    // 拷贝一份数据给 filter
-    treeData = this.get('outFilter').call(this, $.extend(true, {}, treeData));
-
-    var items = treeData.items;
-    var nodeList;
-
-    if (items && items.length) {
-      nodeList = items;
-    } else {
-      nodeList = [0];
-
-      // 强制无数据时列表刷新
-      nodeList.hacked = true;
+  _onRenderDataList: function(dataList) {
+    if (!dataList) {
+      return;
     }
 
-    this.set('nodeList', nodeList);
-  },
-
-  _onRenderNodeList: function(nodeList) {
-    if (nodeList.hacked) {
-      // 重置
-      nodeList = [];
-      // 回设
-      this.set('nodeList', nodeList, {
-        silent: true
-      });
-    }
-
-    this.renderTree(nodeList);
-  },
-
-  renderTree: function(nodeList) {
-    if (typeof nodeList === 'undefined') {
-      nodeList = this.get('nodeList');
-    }
-
-    if (nodeList) {
-      this.treeRoot = this.renderNode({
-        parent: -1,
-        id: 0,
-        name: this.get('treeName'),
-        opened: this.get('opened'),
-        checked: this.get('checked'),
-        children: nodeList,
-        tree: this
-      });
-    }
+    dataList.forEach(this.renderNode.bind(this));
   },
 
   renderNode: function(data) {
+    data.async = this.get('async');
+    data.parentNode = this.getNodeById(data.parent);
     data.tree = this;
-
-    if (!data.children) {
-      data.children = [];
-    }
-
-    return treeNode(data);
+    return (this[RENDERED_NODES_TOKEN][data.id] = treeNode(data));
   },
 
   appendChild: function(node) {
@@ -306,12 +198,38 @@ var Tree = Widget.extend({
     node.element.remove();
   },
 
-  getNode: function(id) {
-    return treeNode(this.$('[data-node-id="' + id + '"]'));
+  getNodeById: function(id) {
+    if (!this[RENDERED_NODES_TOKEN][id]) {
+      this[RENDERED_NODES_TOKEN][id] = treeNode(this.$('[data-node-id="' + id + '"]'));
+    }
+
+    return this[RENDERED_NODES_TOKEN][id];
   },
 
-  getData: function() {
+  getDataById: function(id) {
+    if (id > 0) {
+      return this.getNodeById(id).get('data');
+    }
+
     return this.treeRoot.get('data');
+  },
+
+  getCheckedNodes: function() {
+    var nodes = this[RENDERED_NODES_TOKEN];
+    return Object.keys(nodes).filter(function(id) {
+      return +id !== -1 &&
+        nodes[id].get('checked') === enums.CHECK_STATE_ALL;
+    }).map(function(id) {
+      return nodes[id];
+    });
+  },
+
+  getCheckedIds: function() {
+    var nodes = this[RENDERED_NODES_TOKEN];
+    return Object.keys(nodes).filter(function(id) {
+      return +id !== -1 &&
+        nodes[id].get('checked') === enums.CHECK_STATE_ALL;
+    });
   },
 
   translate: function(node) {
@@ -336,26 +254,36 @@ var Tree = Widget.extend({
     return node;
   },
 
-  modifyNode: function(data) {
-    this.getNode(data.id).set('data', this.translate(data));
+  /**
+   * 获取当前选中的节点（单选树）
+   * @private
+   * @return {TreeNode} 节点
+   */
+  _getCheckedNode: function() {
+    return this[CHECKED_NODE_TOKEN];
   },
 
-  deleteNode: function(id) {
-    this.getNode(id).destroy();
+  /**
+   * @private
+   */
+  _setCheckedNode: function(node) {
+    this[CHECKED_NODE_TOKEN] = node;
   },
 
-  insertNode: function(data) {
-    this.renderNode(this.translate(data));
+  /**
+   * 获取当前选中的节点（单选树）
+   * @private
+   * @return {TreeNode} 节点
+   */
+  _getSelectedNode: function() {
+    return this[SELECTED_NODE_TOKEN];
   },
 
-  addNodeAction: function(options, index) {
-    var nodeActions = this.get('nodeActions');
-
-    if (typeof index === 'undefined') {
-      nodeActions.push(options);
-    } else {
-      nodeActions.splice(index, 0, options);
-    }
+  /**
+   * @private
+   */
+  _setSelectedNode: function(node) {
+    this[SELECTED_NODE_TOKEN] = node;
   }
 
 });
