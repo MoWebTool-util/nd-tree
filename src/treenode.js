@@ -43,10 +43,12 @@ var TreeNode = Widget.extend({
     classPrefix: 'ui-tree-node',
 
     template: require('./treenode.handlebars'),
+    partial: require('./partial-icon.handlebars'),
 
     parent: null,
     id: null,
     name: null,
+    icon: null,
     opened: null,
     selected: null,
     checked: {
@@ -57,6 +59,7 @@ var TreeNode = Widget.extend({
     },
     checkable: null,
     multiple: null,
+    iconShow: null,
     children: null,
 
     data: {
@@ -68,6 +71,7 @@ var TreeNode = Widget.extend({
           parent: this.get('parent'),
           opened: this.get('opened'),
           checked: this.get('checked'),
+          iconShow: this.get('iconShow'),
           // 真实数据
           children: (function(children) {
             return Object.keys(children).map(function(id) {
@@ -99,13 +103,15 @@ var TreeNode = Widget.extend({
   events: {
     'mouseover .name': function(e) {
       e.stopPropagation();
-
       this.element.addClass(CLS_HOVERING);
+      // this.set('hovered', true);
+      this.trigger('mouseover', e, '', 'mouseover', this);
     },
     'mouseout .name': function(e) {
       e.stopPropagation();
-
       this.element.removeClass(CLS_HOVERING);
+      // this.set('hovered', false);
+      this.trigger('mouseout', e, '', 'mouseout', this);
     },
     'click .name': function(e) {
       e.stopPropagation();
@@ -128,7 +134,7 @@ var TreeNode = Widget.extend({
 
   initAttrs: function(config) {
     // copy from parent
-    ['async', 'tree', 'foldable', 'checkable', 'multiple']
+    ['async', 'tree', 'foldable', 'checkable', 'multiple', 'iconShow']
     .forEach(function(key) {
       if (!config.hasOwnProperty(key)) {
         config[key] = config.parentNode.get(key);
@@ -365,6 +371,16 @@ var TreeNode = Widget.extend({
     this.element.attr('data-node-id', id);
   },
 
+  _onRenderIcon: function(icon) {
+    if (!this.get('iconShow')) {
+      return;
+    }
+    this.element.children('.name').before(
+      this.get('partial')({
+        icon: icon
+      }));
+  },
+
   _onRenderChildren: function(children) {
     if (children && children.length) {
       children.forEach(function(node, i) {
@@ -522,9 +538,27 @@ var TreeNode = Widget.extend({
   },
 
   destroy: function() {
+    // 删除子节点
+    var children = this._childNodes;
+    Object.keys(children).forEach(function(id) {
+      var child = children[id];
+      child && child.destroy && child.destroy();
+    });
+    // 设置selected = false
+    this.set('selected', false);
+    // 设置checked = false
+    this.set('checked', false);
+    // 设置opened = false
+    this.set('opened', false);
+    // 移除tree[RENDERED_NODES_TOKEN]
+    var tree = this.get('tree');
+    tree._removeRenderedNode(this);
+    // 通知父节点删除
     var parentNode = this.get('parentNode');
-    parentNode && parentNode.removeChild(this);
-
+    if (parentNode instanceof TreeNode) {
+      parentNode.removeChild(this);
+    }
+    // 自己销毁
     TreeNode.superclass.destroy.call(this);
   }
 });

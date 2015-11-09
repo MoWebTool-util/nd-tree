@@ -115,7 +115,8 @@ var Tree = Widget.extend({
     checkable: false,
     multiple: true,
     opened: false,
-    checked: false
+    checked: false,
+    iconShow: false
   },
 
   // events: {},
@@ -151,11 +152,13 @@ var Tree = Widget.extend({
       parent: -1,
       id: 0,
       name: this.get('treeName'),
+      icon: this.get('treeIcon'),
       opened: this.get('opened'),
       checked: this.get('checked'),
       foldable: this.get('foldable'),
       checkable: this.get('checkable'),
       multiple: this.get('multiple'),
+      iconShow: this.get('iconShow'),
       children: []
     });
   },
@@ -193,9 +196,22 @@ var Tree = Widget.extend({
   appendChild: function(node) {
     this.element.children('ul').append(node.element);
   },
-
-  removeChild: function(node) {
-    node.element.remove();
+  /**
+   * 删除某个节点下的某个子节点。如果不传child，删除全部子节点。
+   * @param  {node} node
+   * @param  {node} child
+   * @return
+   */
+  removeChild: function(node, child) {
+    var children = node.children(function(id) {
+      return child ? (child.get('id') === id ? true : false) : true;
+    });
+    Object.keys(children).forEach(function(i) {
+      this.removeNode(children[i]);
+    }.bind(this));
+  },
+  removeNode: function(node) {
+    node.destroy();
   },
 
   getNodeById: function(id) {
@@ -284,8 +300,16 @@ var Tree = Widget.extend({
    */
   _setSelectedNode: function(node) {
     this[SELECTED_NODE_TOKEN] = node;
+  },
+  /**
+   * @private
+   */
+  _removeRenderedNode: function(node) {
+    var id = node.get('id');
+    if (this[RENDERED_NODES_TOKEN][id]) {
+      delete this[RENDERED_NODES_TOKEN][id];
+    }
   }
-
 });
 
 module.exports = Tree;
