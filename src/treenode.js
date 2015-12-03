@@ -43,12 +43,10 @@ var TreeNode = Widget.extend({
     classPrefix: 'ui-tree-node',
 
     template: require('./treenode.handlebars'),
-    partial: require('./partial-icon.handlebars'),
 
     parent: null,
     id: null,
     name: null,
-    icon: null,
     opened: null,
     selected: null,
     checked: {
@@ -59,26 +57,47 @@ var TreeNode = Widget.extend({
     },
     checkable: null,
     multiple: null,
-    iconShow: null,
     children: null,
 
     data: {
       value: null,
-      getter: function( /*val*/ ) {
-        return {
+      getter: function(val, key, options) {
+        var data = {
           id: this.get('id'),
           name: this.get('name'),
           parent: this.get('parent'),
           opened: this.get('opened'),
-          checked: this.get('checked'),
-          iconShow: this.get('iconShow'),
-          // 真实数据
-          children: (function(children) {
-            return Object.keys(children).map(function(id) {
-              return children[id].get('data');
-            });
-          })(this.children())
+          checked: this.get('checked')
         };
+
+        if (options && options.least &&
+            data.checked === CHECK_STATE_ALL) {
+          return data;
+        }
+
+        if (options && options.check) {
+          if (data.checked === CHECK_STATE_NONE) {
+            return data;
+          }
+
+          data.children = (function(children) {
+            return Object.keys(children).filter(function(id) {
+              return children[id].get('checked') !== CHECK_STATE_NONE;
+            }).map(function(id) {
+              return children[id].get('data', options);
+            });
+          })(this.children());
+
+          return data;
+        }
+
+        data.children = (function(children) {
+          return Object.keys(children).map(function(id) {
+            return children[id].get('data', options);
+          });
+        })(this.children());
+
+        return data;
       },
       setter: function(val) {
         Object.keys(val).forEach(function(key) {
@@ -101,17 +120,15 @@ var TreeNode = Widget.extend({
   },
 
   events: {
-    'mouseover .name': function(e) {
+    'mouseover': function(e) {
       e.stopPropagation();
+
       this.element.addClass(CLS_HOVERING);
-      // this.set('hovered', true);
-      this.trigger('mouseover', e, '', 'mouseover', this);
     },
-    'mouseout .name': function(e) {
+    'mouseout': function(e) {
       e.stopPropagation();
+
       this.element.removeClass(CLS_HOVERING);
-      // this.set('hovered', false);
-      this.trigger('mouseout', e, '', 'mouseout', this);
     },
     'click .name': function(e) {
       e.stopPropagation();
@@ -134,7 +151,7 @@ var TreeNode = Widget.extend({
 
   initAttrs: function(config) {
     // copy from parent
-    ['async', 'tree', 'foldable', 'checkable', 'multiple', 'iconShow']
+    ['async', 'tree', 'foldable', 'checkable', 'multiple']
     .forEach(function(key) {
       if (!config.hasOwnProperty(key)) {
         config[key] = config.parentNode.get(key);
@@ -195,6 +212,10 @@ var TreeNode = Widget.extend({
       tree._setSelectedNode(this);
     }
   },
+
+  // _onChangeCheckable: function(checkable) {
+  //   this.element.toggleClass(this.get('classPrefix') + '-checkable', checkable);
+  // },
 
   _onRenderOpened: function(opened) {
     this.element.toggleClass(CLS_OPENED, opened);
@@ -371,16 +392,6 @@ var TreeNode = Widget.extend({
     this.element.attr('data-node-id', id);
   },
 
-  _onRenderIcon: function(icon) {
-    if (!this.get('iconShow')) {
-      return;
-    }
-    this.element.children('.name').before(
-      this.get('partial')({
-        icon: icon
-      }));
-  },
-
   _onRenderChildren: function(children) {
     if (children && children.length) {
       children.forEach(function(node, i) {
@@ -538,27 +549,9 @@ var TreeNode = Widget.extend({
   },
 
   destroy: function() {
-    // 删除子节点
-    var children = this._childNodes;
-    Object.keys(children).forEach(function(id) {
-      var child = children[id];
-      child && child.destroy && child.destroy();
-    });
-    // 设置selected = false
-    this.set('selected', false);
-    // 设置checked = false
-    this.set('checked', false);
-    // 设置opened = false
-    this.set('opened', false);
-    // 移除tree[RENDERED_NODES_TOKEN]
-    var tree = this.get('tree');
-    tree._removeRenderedNode(this);
-    // 通知父节点删除
     var parentNode = this.get('parentNode');
-    if (parentNode instanceof TreeNode) {
-      parentNode.removeChild(this);
-    }
-    // 自己销毁
+    parentNode && parentNode.removeChild(this);
+
     TreeNode.superclass.destroy.call(this);
   }
 });

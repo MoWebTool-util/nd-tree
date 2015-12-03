@@ -12,6 +12,10 @@ var treeNode = require('./src/treenode');
 
 var enums = require('./src/enums');
 
+// var CHECK_STATE_NONE = enums.CHECK_STATE_NONE;
+var CHECK_STATE_ALL = enums.CHECK_STATE_ALL;
+// var CHECK_STATE_HAS = enums.CHECK_STATE_HAS;
+
 var CHECKED_NODE_TOKEN = '__CHECKED_NODE';
 var SELECTED_NODE_TOKEN = '__SELECTED_ELEMENT';
 var RENDERED_NODES_TOKEN = '__RENDERED_NODES';
@@ -38,6 +42,7 @@ var Tree = Widget.extend({
     // },
 
     treeName: '根节点',
+    treeId: 0,
 
     // 行处理
     nodeActions: [],
@@ -115,8 +120,7 @@ var Tree = Widget.extend({
     checkable: false,
     multiple: true,
     opened: false,
-    checked: false,
-    iconShow: false
+    checked: false
   },
 
   // events: {},
@@ -150,15 +154,13 @@ var Tree = Widget.extend({
   setup: function() {
     this.treeRoot = this.renderNode({
       parent: -1,
-      id: 0,
+      id: this.get('treeId'),
       name: this.get('treeName'),
-      icon: this.get('treeIcon'),
       opened: this.get('opened'),
       checked: this.get('checked'),
       foldable: this.get('foldable'),
       checkable: this.get('checkable'),
       multiple: this.get('multiple'),
-      iconShow: this.get('iconShow'),
       children: []
     });
   },
@@ -196,22 +198,9 @@ var Tree = Widget.extend({
   appendChild: function(node) {
     this.element.children('ul').append(node.element);
   },
-  /**
-   * 删除某个节点下的某个子节点。如果不传child，删除全部子节点。
-   * @param  {node} node
-   * @param  {node} child
-   * @return
-   */
-  removeChild: function(node, child) {
-    var children = node.children(function(id) {
-      return child ? (child.get('id') === id ? true : false) : true;
-    });
-    Object.keys(children).forEach(function(i) {
-      this.removeNode(children[i]);
-    }.bind(this));
-  },
-  removeNode: function(node) {
-    node.destroy();
+
+  removeChild: function(node) {
+    node.element.remove();
   },
 
   getNodeById: function(id) {
@@ -222,29 +211,57 @@ var Tree = Widget.extend({
     return this[RENDERED_NODES_TOKEN][id];
   },
 
-  getDataById: function(id) {
+  getDataById: function(id, options) {
     if (id > 0) {
-      return this.getNodeById(id).get('data');
+      return this.getNodeById(id).get('data', options || {});
     }
 
-    return this.treeRoot.get('data');
+    return this.treeRoot.get('data', options || {});
   },
 
   getCheckedNodes: function() {
     var nodes = this[RENDERED_NODES_TOKEN];
     return Object.keys(nodes).filter(function(id) {
       return +id !== -1 &&
-        nodes[id].get('checked') === enums.CHECK_STATE_ALL;
+        nodes[id].get('checked') === CHECK_STATE_ALL;
     }).map(function(id) {
       return nodes[id];
     });
   },
 
-  getCheckedIds: function() {
+  getCheckedIds: function(least, reducer) {
+    if (least) {
+      reducer || (reducer = function(node) {
+        return node.id;
+      });
+
+      var node = this.getDataById(0, { least: true, check: 1 });
+
+      if (node.checked === CHECK_STATE_ALL) {
+        return [reducer(node)];
+      }
+
+      var checkedIds = [];
+
+      function _walkChildren(children) {
+        children && children.forEach(function(child) {
+          if (child.checked === CHECK_STATE_ALL) {
+            checkedIds.push(reducer(child));
+          } else {
+            _walkChildren(child.children);
+          }
+        })
+      }
+
+      _walkChildren(node.children);
+
+      return checkedIds;
+    }
+
     var nodes = this[RENDERED_NODES_TOKEN];
     return Object.keys(nodes).filter(function(id) {
       return +id !== -1 &&
-        nodes[id].get('checked') === enums.CHECK_STATE_ALL;
+        nodes[id].get('checked') === CHECK_STATE_ALL;
     });
   },
 
@@ -300,16 +317,8 @@ var Tree = Widget.extend({
    */
   _setSelectedNode: function(node) {
     this[SELECTED_NODE_TOKEN] = node;
-  },
-  /**
-   * @private
-   */
-  _removeRenderedNode: function(node) {
-    var id = node.get('id');
-    if (this[RENDERED_NODES_TOKEN][id]) {
-      delete this[RENDERED_NODES_TOKEN][id];
-    }
   }
+
 });
 
 module.exports = Tree;
