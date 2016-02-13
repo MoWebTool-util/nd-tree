@@ -1,13 +1,15 @@
 # nd-tree
 
-[![spm version](http://spm.crossjs.com/badge/nd-tree)](http://spm.crossjs.com/package/nd-tree)
+[![Travis](https://img.shields.io/travis/ndfront/nd-tree.svg?style=flat-square)](https://github.com/ndfront/nd-tree)
+[![Coveralls](https://img.shields.io/coveralls/ndfront/nd-tree.svg?style=flat-square)](https://github.com/ndfront/nd-tree)
+[![NPM version](https://img.shields.io/npm/v/nd-tree.svg?style=flat-square)](https://npmjs.org/package/nd-tree)
 
 > a simple tree support fold and expand
 
 ## 安装
 
 ```bash
-$ spm install nd-tree --save
+$ npm install nd-tree --save
 ```
 
 ## 使用

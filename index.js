@@ -5,6 +5,7 @@
 
 'use strict';
 
+var __ = require('nd-i18n');
 var Widget = require('nd-widget');
 var Template = require('nd-template');
 
@@ -41,7 +42,7 @@ var Tree = Widget.extend({
     //   parent: 'parent_id'
     // },
 
-    treeName: '根节点',
+    treeName: __('根节点'),
     treeId: 0,
 
     // 行处理
@@ -243,7 +244,7 @@ var Tree = Widget.extend({
 
       var checkedIds = [];
 
-      function _walkChildren(children) {
+      var _walkChildren = function(children) {
         children && children.forEach(function(child) {
           if (child.checked === CHECK_STATE_ALL) {
             checkedIds.push(reducer(child));
