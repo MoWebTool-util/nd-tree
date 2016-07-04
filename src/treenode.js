@@ -327,11 +327,11 @@ var TreeNode = Widget.extend({
     }
 
     // 自动打开
-    if (checked === CHECK_STATE_ALL) {
-      if (!this.get('opened')) {
-        this.set('opened', true);
-      }
-    }
+    // if (checked === CHECK_STATE_ALL) {
+    //   if (!this.get('opened')) {
+    //     this.set('opened', true);
+    //   }
+    // }
 
     // 向内：
     // 只处理非半选，因为半选子节点无变更

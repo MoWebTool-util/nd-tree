@@ -15,7 +15,7 @@ var enums = require('./src/enums');
 
 // var CHECK_STATE_NONE = enums.CHECK_STATE_NONE;
 var CHECK_STATE_ALL = enums.CHECK_STATE_ALL;
-// var CHECK_STATE_HAS = enums.CHECK_STATE_HAS;
+var CHECK_STATE_HAS = enums.CHECK_STATE_HAS;
 
 var CHECKED_NODE_TOKEN = '__CHECKED_NODE';
 var SELECTED_NODE_TOKEN = '__SELECTED_ELEMENT';
@@ -264,6 +264,42 @@ var Tree = Widget.extend({
       return +id !== -1 &&
         nodes[id].get('checked') === CHECK_STATE_ALL;
     });
+  },
+
+  getRealCheckedNode: function(){
+    var parentNameArr = [];
+
+    var reducer = function(node) {
+      parentNameArr.push(node.name)
+      return {
+        id: node.id,
+        name: parentNameArr.slice(0)
+      }
+    };
+
+    var node = this.getDataById(0, { least: true, check: 1 });
+
+    if (node.checked === CHECK_STATE_ALL) {
+      return [reducer(node)];
+    }
+    var checkedIds = [];
+    var _walkChildren = function(node) {
+      parentNameArr.push(node.name)
+      var children = node.children
+      children && children.forEach(function(child) {
+        if (child.checked === CHECK_STATE_ALL) {
+          checkedIds.push(reducer(child));
+          parentNameArr.pop()
+        } else if (child.checked === CHECK_STATE_HAS) {
+          _walkChildren(child);
+        }
+      })
+      parentNameArr.pop()
+    }
+
+    _walkChildren(node);
+
+    return checkedIds;
   },
 
   translate: function(node) {
