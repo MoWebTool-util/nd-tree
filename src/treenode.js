@@ -49,6 +49,7 @@ var TreeNode = Widget.extend({
     name: null,
     opened: null,
     selected: null,
+    status: null,
     checked: {
       value: null,
       setter: function(val) {
@@ -67,9 +68,9 @@ var TreeNode = Widget.extend({
           name: this.get('name'),
           parent: this.get('parent'),
           opened: this.get('opened'),
-          checked: this.get('checked')
+          checked: this.get('checked'),
+          status: this.get('status')
         };
-
         if (options && options.least &&
             data.checked === CHECK_STATE_ALL) {
           return data;
@@ -325,13 +326,14 @@ var TreeNode = Widget.extend({
     if (multiple || this.get('tree')._getCheckedNode() !== parentNode) {
       parentNode._checkChecked && parentNode._checkChecked(checked);
     }
-
     // 自动打开
-    // if (checked === CHECK_STATE_ALL) {
-    //   if (!this.get('opened')) {
-    //     this.set('opened', true);
-    //   }
-    // }
+    if (checked === CHECK_STATE_ALL && this.get('status') === 1) {
+      if (!this.get('opened')) {
+        this.set('opened', true);
+      }
+    }else if(checked === CHECK_STATE_ALL && this.get('status') === 2){
+      this.get('tree').trigger('nodeChanged', null, null, 'checked');
+    }
 
     // 向内：
     // 只处理非半选，因为半选子节点无变更
@@ -454,7 +456,6 @@ var TreeNode = Widget.extend({
     if (originalParentNode) {
       originalParentNode.removeChild(this);
     }
-
     parentNode.insertChild && parentNode.insertChild(this);
     parentNode.appendChild && parentNode.appendChild(this);
   },

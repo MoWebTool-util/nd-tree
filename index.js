@@ -44,14 +44,14 @@ var Tree = Widget.extend({
 
     treeName: __('根节点'),
     treeId: 0,
-
+    //不过滤数据
+    status: 2,
     // 行处理
     nodeActions: [],
 
     async: false,
 
     autoload: true,
-
     //数据源
     dataSource: {
       value: null,
@@ -162,6 +162,7 @@ var Tree = Widget.extend({
       foldable: this.get('foldable'),
       checkable: this.get('checkable'),
       multiple: this.get('multiple'),
+      status: this.get('status'),
       children: []
     });
   },
@@ -231,6 +232,7 @@ var Tree = Widget.extend({
   },
 
   getCheckedIds: function(least, reducer) {
+
     if (least) {
       reducer || (reducer = function(node) {
         return node.id;
@@ -279,7 +281,7 @@ var Tree = Widget.extend({
 
     var node = this.getDataById(0, { least: true, check: 1 });
 
-    if (node.checked === CHECK_STATE_ALL) {
+    if (node.checked === CHECK_STATE_ALL && node.status !== 1) {
       return [reducer(node)];
     }
     var checkedIds = [];
@@ -287,10 +289,10 @@ var Tree = Widget.extend({
       parentNameArr.push(node.name)
       var children = node.children
       children && children.forEach(function(child) {
-        if (child.checked === CHECK_STATE_ALL) {
+        if (child.checked === CHECK_STATE_ALL && child.status !== 1) {
           checkedIds.push(reducer(child));
           parentNameArr.pop()
-        } else if (child.checked === CHECK_STATE_HAS) {
+        } else if (child.checked === CHECK_STATE_HAS || (child.checked === CHECK_STATE_ALL && child.status === 1)) {
           _walkChildren(child);
         }
       })
